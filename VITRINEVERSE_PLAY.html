@@ -1,0 +1,1752 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#11131d" />
+  <title>VITRINE//VERSE — Vitrine geek 2D</title>
+  <style>
+:root {
+  --bg: #0b0d14;
+  --panel: rgba(19, 22, 34, 0.94);
+  --panel-2: rgba(28, 32, 48, 0.88);
+  --line: rgba(255,255,255,0.10);
+  --line-strong: rgba(255,255,255,0.18);
+  --text: #f5f6fb;
+  --muted: #9ea5ba;
+  --accent: #8c74ff;
+  --accent-2: #34e5c5;
+  --danger: #ff6d85;
+  --gold: #ffd66b;
+  --radius: 18px;
+  --shadow: 0 18px 60px rgba(0,0,0,.34);
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(117,83,255,.14), transparent 34rem),
+    linear-gradient(135deg, #0a0c12, #111522 52%, #090b11);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+button, input, select { font: inherit; }
+button, select { cursor: pointer; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+
+.topbar {
+  height: 76px;
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) auto minmax(280px, 1fr);
+  align-items: center;
+  gap: 22px;
+  padding: 12px 18px;
+  background: rgba(8,10,16,.87);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+  position: relative;
+  z-index: 30;
+}
+.brand { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.brand-mark {
+  width: 43px; height: 43px; display: grid; place-items: center; border-radius: 13px;
+  background: linear-gradient(145deg, var(--accent), #563bd7);
+  box-shadow: 0 8px 30px rgba(117,83,255,.35);
+  font-weight: 900; letter-spacing: -.08em;
+}
+.brand strong { display: block; font-size: 15px; letter-spacing: .14em; white-space: nowrap; }
+.brand strong span { color: var(--accent-2); }
+.brand small { display: block; color: var(--muted); margin-top: 2px; font-size: 11px; }
+.stats { display: flex; gap: 8px; }
+.stat {
+  min-width: 78px; padding: 8px 11px; border-radius: 13px;
+  background: rgba(255,255,255,.045); border: 1px solid var(--line);
+}
+.stat span { display:block; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; }
+.stat strong { display:block; margin-top: 2px; font-size: 16px; }
+.top-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.button, .icon-button, .tab, .subtab {
+  border: 0; color: var(--text); background: rgba(255,255,255,.08);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease, opacity .15s ease;
+}
+.button:hover:not(:disabled), .icon-button:hover:not(:disabled), .tab:hover, .subtab:hover { transform: translateY(-1px); background: rgba(255,255,255,.13); }
+.button { padding: 10px 14px; border-radius: 11px; font-weight: 750; font-size: 12px; border: 1px solid transparent; }
+.button.ghost { background: rgba(255,255,255,.045); border-color: var(--line); }
+.button.accent { background: linear-gradient(135deg, var(--accent), #6a53df); box-shadow: 0 8px 24px rgba(117,83,255,.22); }
+.button.wide { width: 100%; }
+.icon-button {
+  width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
+  border: 1px solid var(--line); font-size: 20px;
+}
+.text-button { border: 0; background: none; color: var(--muted); font-size: 12px; cursor: pointer; padding: 7px; }
+.text-button.danger { color: var(--danger); }
+
+.app-shell {
+  height: calc(100vh - 76px);
+  display: grid;
+  grid-template-columns: 310px minmax(460px, 1fr) 310px;
+  gap: 0;
+}
+.panel {
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+  position: relative;
+  z-index: 20;
+}
+.library-panel { border-right: 1px solid var(--line); }
+.inspector-panel { border-left: 1px solid var(--line); overflow-y: auto; padding: 16px; }
+.panel-tabs { display: grid; grid-template-columns: repeat(3, 1fr); padding: 12px 12px 0; gap: 6px; }
+.tab { padding: 10px 6px; border-radius: 11px; font-size: 11px; color: var(--muted); }
+.tab.active { background: rgba(140,116,255,.18); color: white; box-shadow: inset 0 0 0 1px rgba(140,116,255,.36); }
+.panel-view { display:none; height: calc(100% - 57px); padding: 15px; overflow-y: auto; }
+.panel-view.active { display:block; }
+.panel-heading { display:flex; justify-content:space-between; align-items:center; margin-bottom: 13px; }
+h1,h2,h3,p { margin-top: 0; }
+h2 { margin-bottom: 0; font-size: 20px; }
+h3 { margin-bottom: 0; font-size: 15px; }
+.eyebrow { margin-bottom: 4px; font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent-2); font-weight: 800; }
+.muted { color: var(--muted); line-height: 1.55; font-size: 12px; }
+.search-field { display:flex; align-items:center; gap:8px; padding: 9px 11px; border-radius: 12px; background: rgba(255,255,255,.045); border:1px solid var(--line); }
+.search-field input { width:100%; border:0; outline:0; background:transparent; color:var(--text); font-size:12px; }
+.filter-row { display:flex; gap:6px; overflow-x:auto; padding: 10px 0 12px; scrollbar-width:none; }
+.filter-row::-webkit-scrollbar { display:none; }
+.filter-chip { white-space:nowrap; border:1px solid var(--line); background:rgba(255,255,255,.03); color:var(--muted); border-radius:999px; padding:6px 9px; font-size:10px; cursor:pointer; }
+.filter-chip.active { color:white; background:rgba(52,229,197,.14); border-color:rgba(52,229,197,.36); }
+.card-grid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:9px; }
+.item-card {
+  min-height: 163px; border-radius: 15px; padding: 9px; background: rgba(255,255,255,.045);
+  border:1px solid var(--line); cursor: grab; position:relative; overflow:hidden;
+}
+.item-card:hover, .item-card.selected { border-color: rgba(140,116,255,.55); background:rgba(140,116,255,.08); }
+.item-card:active { cursor:grabbing; }
+.item-card-visual { height:93px; display:grid; place-items:center; border-radius:11px; background:radial-gradient(circle, rgba(140,116,255,.10), transparent 70%); }
+.item-card-visual img { max-width: 92%; max-height: 92%; filter: drop-shadow(0 10px 9px rgba(0,0,0,.34)); pointer-events:none; }
+.item-card h4 { font-size:11px; margin:8px 0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.item-card-meta { display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:9px; }
+.item-card .quick-place { position:absolute; top:7px; right:7px; width:28px; height:28px; border-radius:9px; border:1px solid var(--line); background:rgba(10,12,18,.72); color:white; opacity:0; }
+.item-card:hover .quick-place, .item-card:focus-within .quick-place { opacity:1; }
+.rarity-dot { width:7px; height:7px; border-radius:50%; display:inline-block; margin-right:4px; }
+.rarity-common { --rarity:#a9b0c0; }
+.rarity-uncommon { --rarity:#67d69b; }
+.rarity-rare { --rarity:#56a8ff; }
+.rarity-epic { --rarity:#b67aff; }
+.rarity-legendary { --rarity:#ffd66b; }
+.rarity-dot { background: var(--rarity); box-shadow: 0 0 9px var(--rarity); }
+.empty-state { color:var(--muted); text-align:center; padding:30px 6px; font-size:12px; }
+
+.subtabs { display:flex; gap:6px; margin-bottom:12px; }
+.subtab { flex:1; padding:8px 6px; border-radius:10px; color:var(--muted); font-size:10px; border:1px solid var(--line); }
+.subtab.active { color:white; background:rgba(140,116,255,.16); }
+.shop-list { display:flex; flex-direction:column; gap:9px; }
+.shop-card {
+  display:grid; grid-template-columns: 68px 1fr auto; gap:10px; align-items:center;
+  padding:10px; border-radius:14px; background:rgba(255,255,255,.045); border:1px solid var(--line);
+}
+.shop-card img { width:64px; height:64px; object-fit:contain; filter:drop-shadow(0 8px 7px rgba(0,0,0,.3)); }
+.shop-card h4 { margin:0 0 4px; font-size:11px; }
+.shop-card p { margin:0; color:var(--muted); font-size:9px; line-height:1.4; }
+.shop-card .price { display:flex; flex-direction:column; gap:5px; align-items:flex-end; font-size:11px; font-weight:800; color:var(--gold); }
+.shop-card .button { padding:7px 9px; font-size:10px; }
+.shop-swatch { width:64px; height:64px; border-radius:13px; border:1px solid var(--line); box-shadow: inset 0 0 20px rgba(255,255,255,.08); }
+.swatch-wood { background:linear-gradient(160deg,#684735,#2b1b18); }
+.swatch-acrylic { background:linear-gradient(145deg,rgba(202,242,255,.55),rgba(128,165,181,.16)); }
+.swatch-metal { background:linear-gradient(145deg,#89919d,#353a43); }
+.swatch-glass { background:linear-gradient(145deg,rgba(216,247,255,.46),rgba(89,132,150,.12)); }
+.swatch-neon { background:linear-gradient(145deg,#27224b,#111226); box-shadow: inset 0 0 0 2px #7b6cff, 0 0 16px rgba(123,108,255,.4); }
+.swatch-museum { background:linear-gradient(145deg,#e5dfd5,#77746f); }
+.swatch-bedroom { background:linear-gradient(145deg,#554139,#1d1a1d); }
+.swatch-neonroom { background:linear-gradient(145deg,#3d235b,#101429); }
+.swatch-museumroom { background:linear-gradient(145deg,#d4d7df,#7a828e); }
+.swatch-retroroom { background:linear-gradient(145deg,#27315c,#5b2350); }
+
+.collection-list { display:flex; flex-direction:column; gap:10px; }
+.collection-row { padding:12px; border-radius:14px; background:rgba(255,255,255,.045); border:1px solid var(--line); }
+.collection-row header { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.collection-row h4 { margin:0; font-size:11px; }
+.collection-row small { color:var(--muted); }
+.mini-progress { height:6px; border-radius:999px; background:rgba(255,255,255,.08); overflow:hidden; margin-top:9px; }
+.mini-progress span { display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-2)); }
+
+.stage-wrap { min-width:0; display:grid; grid-template-rows:auto minmax(0,1fr) auto; background:#0b0e17; position:relative; }
+.room-toolbar { display:flex; align-items:center; gap:10px; padding:10px 14px; background:rgba(13,16,25,.96); border-bottom:1px solid var(--line); position:relative; z-index:15; }
+.toolbar-group { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:10px; }
+.toolbar-group select { color:white; background:rgba(255,255,255,.06); border:1px solid var(--line); padding:8px 28px 8px 9px; border-radius:10px; font-size:11px; }
+.room-scroll { min-height:0; overflow:auto; }
+.room {
+  min-height:100%; padding: 48px clamp(22px, 5vw, 72px) 70px; position:relative; isolation:isolate;
+  background-color:#231d20;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+    radial-gradient(circle at 50% -20%, rgba(255,214,165,.28), transparent 50%);
+  background-size:38px 38px,38px 38px,auto;
+  transition: background .35s ease, filter .35s ease;
+}
+body[data-room-theme="neonroom"] .room { background-color:#101326; background-image:linear-gradient(rgba(104,86,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(104,86,255,.08) 1px,transparent 1px),radial-gradient(circle at 75% 20%,rgba(244,68,255,.28),transparent 42%),radial-gradient(circle at 20% 15%,rgba(42,221,255,.18),transparent 40%); background-size:44px 44px,44px 44px,auto,auto; }
+body[data-room-theme="museumroom"] .room { background-color:#bfc3ca; background-image:linear-gradient(120deg,rgba(255,255,255,.35),transparent 45%),radial-gradient(circle at 50% -20%,rgba(255,255,255,.75),transparent 52%); }
+body[data-room-theme="retroroom"] .room { background-color:#171b35; background-image:radial-gradient(circle at 10px 10px,rgba(255,255,255,.12) 2px,transparent 2px),linear-gradient(145deg,rgba(246,75,175,.18),transparent 45%),linear-gradient(30deg,rgba(44,215,235,.16),transparent 40%); background-size:30px 30px,auto,auto; }
+body[data-light="cool"] .room { filter: saturate(.92) brightness(1.08); }
+body[data-light="neon"] .room { filter: saturate(1.25) contrast(1.04); }
+body[data-light="dark"] .room { filter: brightness(.64) saturate(.9); }
+.ambient-glow { position:absolute; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(ellipse at 50% 35%,rgba(255,225,190,.12),transparent 48%); }
+body[data-light="neon"] .ambient-glow { background:radial-gradient(ellipse at 28% 34%,rgba(58,220,255,.19),transparent 44%),radial-gradient(ellipse at 72% 40%,rgba(230,67,255,.18),transparent 46%); }
+body[data-light="dark"] .ambient-glow { background:radial-gradient(ellipse at 50% 44%,rgba(101,91,255,.15),transparent 40%); }
+.wall-art { position:absolute; color:rgba(255,255,255,.08); font-weight:1000; letter-spacing:.08em; z-index:-1; user-select:none; }
+.wall-art-a { left:4%; top:20%; font-size:clamp(28px,4vw,58px); line-height:.85; transform:rotate(-4deg); }
+.wall-art-b { right:7%; top:14%; font-size:90px; color:rgba(255,214,107,.08); transform:rotate(8deg); }
+body[data-room-theme="museumroom"] .wall-art { color:rgba(30,34,45,.08); }
+.display-shell { max-width:1050px; margin:0 auto; position:relative; }
+.display-header { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:18px; color:white; text-shadow:0 2px 12px rgba(0,0,0,.35); }
+body[data-room-theme="museumroom"] .display-header { color:#20242d; text-shadow:none; }
+.display-header h1 { margin:0; font-size:clamp(24px,3.1vw,44px); letter-spacing:-.04em; }
+.display-badge { padding:9px 12px; border-radius:999px; background:rgba(7,9,14,.38); border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(10px); font-size:11px; }
+.shelves { display:flex; flex-direction:column; gap:18px; }
+.shelf-unit {
+  min-height:184px; border-radius:14px 14px 6px 6px; position:relative; padding:18px 14px 21px;
+  background:linear-gradient(180deg,rgba(10,12,18,.28),rgba(10,12,18,.45));
+  border:1px solid rgba(255,255,255,.11); box-shadow:0 26px 35px rgba(0,0,0,.28), inset 0 -18px 26px rgba(0,0,0,.20);
+  transition:border-color .15s ease, transform .15s ease;
+}
+.shelf-unit.drag-over { border-color:var(--accent-2); transform:scale(1.006); box-shadow:0 0 0 2px rgba(52,229,197,.22),0 26px 35px rgba(0,0,0,.28); }
+.shelf-unit::after { content:""; position:absolute; left:-7px; right:-7px; bottom:-8px; height:20px; border-radius:3px 3px 8px 8px; background:linear-gradient(#5a3f30,#271a16); box-shadow:0 10px 16px rgba(0,0,0,.42); }
+.shelf-wood::after { background:linear-gradient(#75533f,#2e1e19); }
+.shelf-acrylic { background:linear-gradient(180deg,rgba(200,240,255,.10),rgba(26,50,62,.18)); }
+.shelf-acrylic::after { background:linear-gradient(rgba(220,248,255,.82),rgba(91,133,150,.55)); box-shadow:0 7px 12px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.8); }
+.shelf-metal::after { background:linear-gradient(#9199a4,#3b4048); }
+.shelf-glass { overflow:hidden; background:linear-gradient(145deg,rgba(216,247,255,.10),rgba(10,20,28,.34)); }
+.shelf-glass::before { content:""; position:absolute; inset:7px; border:1px solid rgba(215,247,255,.22); border-radius:9px; pointer-events:none; background:linear-gradient(120deg,rgba(255,255,255,.08),transparent 18% 74%,rgba(255,255,255,.06)); z-index:9; }
+.shelf-glass::after { background:linear-gradient(rgba(210,238,246,.7),rgba(70,104,117,.7)); }
+.shelf-neon { border-color:rgba(125,106,255,.35); box-shadow:0 0 30px rgba(92,75,255,.12),inset 0 -18px 26px rgba(0,0,0,.24); }
+.shelf-neon::after { background:linear-gradient(#473d94,#17142f); box-shadow:0 0 16px rgba(104,86,255,.8),0 10px 16px rgba(0,0,0,.42); }
+.shelf-museum { background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(30,33,40,.35)); }
+.shelf-museum::after { background:linear-gradient(#ede9df,#77736c); }
+.shelf-topline { display:flex; justify-content:space-between; align-items:center; position:relative; z-index:12; }
+.shelf-label { display:flex; align-items:center; gap:7px; font-size:10px; color:rgba(255,255,255,.76); }
+.shelf-label strong { color:white; }
+.shelf-capacity { color:var(--muted); font-size:9px; }
+.shelf-actions { display:flex; gap:4px; }
+.shelf-actions button { width:25px; height:25px; border-radius:8px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.10); color:white; }
+.shelf-items { position:absolute; left:12px; right:12px; bottom:11px; top:37px; z-index:5; }
+.placed-item {
+  position:absolute; bottom:0; transform:translateX(-50%) scale(var(--item-scale,1)); transform-origin:50% 100%;
+  width:var(--item-width); height:var(--item-height); cursor:grab; user-select:none; touch-action:none;
+  transition:filter .15s ease, opacity .15s ease;
+}
+.placed-item.flipped img { transform:scaleX(-1); }
+.placed-item.selected { filter:drop-shadow(0 0 9px rgba(52,229,197,.85)); z-index:20 !important; }
+.placed-item.dragging { opacity:.5; }
+.placed-item img { width:100%; height:100%; object-fit:contain; pointer-events:none; filter:drop-shadow(0 10px 5px rgba(0,0,0,.38)); }
+.item-base-shadow { position:absolute; left:18%; right:18%; bottom:-1px; height:8px; border-radius:50%; background:rgba(0,0,0,.30); filter:blur(4px); z-index:-1; }
+.dusty .placed-item img { filter:drop-shadow(0 10px 5px rgba(0,0,0,.38)) saturate(.78) opacity(.86); }
+.shelf-empty { position:absolute; inset:43px 18px 18px; display:grid; place-items:center; text-align:center; border:1px dashed rgba(255,255,255,.12); border-radius:12px; color:rgba(255,255,255,.32); font-size:11px; }
+.floor-shadow { height:28px; max-width:900px; margin:10px auto 0; background:radial-gradient(ellipse,rgba(0,0,0,.30),transparent 70%); }
+.stage-footer { display:flex; justify-content:space-between; gap:20px; padding:9px 14px; background:rgba(10,12,19,.96); border-top:1px solid var(--line); color:var(--muted); font-size:10px; }
+
+.inspector-card, .challenge-card, .activity-card, .save-card { border-radius:16px; background:rgba(255,255,255,.045); border:1px solid var(--line); padding:14px; margin-bottom:12px; }
+.inspector-visual { height:148px; display:grid; place-items:center; border-radius:13px; background:radial-gradient(circle,rgba(140,116,255,.16),transparent 70%); margin-bottom:12px; }
+.inspector-visual img { max-width:90%; max-height:92%; filter:drop-shadow(0 14px 11px rgba(0,0,0,.35)); }
+.inspector-title-row { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.rarity-badge { color:var(--rarity); border:1px solid color-mix(in srgb,var(--rarity),transparent 55%); background:color-mix(in srgb,var(--rarity),transparent 88%); padding:5px 7px; border-radius:999px; font-size:9px; white-space:nowrap; }
+.inspector-meta { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin:12px 0; }
+.meta-box { padding:8px; border-radius:10px; background:rgba(255,255,255,.035); }
+.meta-box span { display:block; color:var(--muted); font-size:8px; text-transform:uppercase; letter-spacing:.1em; }
+.meta-box strong { display:block; margin-top:3px; font-size:11px; }
+.inspector-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.inspector-actions .button { padding:8px 4px; }
+.inspector-actions .span-all { grid-column:1/-1; }
+.placement-select { width:100%; margin-bottom:7px; background:rgba(255,255,255,.06); color:white; border:1px solid var(--line); padding:9px; border-radius:10px; }
+.section-title-row { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.challenge-card p { color:var(--muted); font-size:11px; line-height:1.45; }
+.reward-pill { color:var(--gold); background:rgba(255,214,107,.10); border:1px solid rgba(255,214,107,.25); padding:6px 8px; border-radius:999px; font-size:10px; font-weight:800; }
+.progress-track { height:7px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden; margin:11px 0 5px; }
+.progress-track span { display:block; height:100%; width:0; background:linear-gradient(90deg,var(--accent),var(--accent-2)); transition:width .25s ease; }
+.challenge-card small { color:var(--muted); display:block; margin-bottom:10px; }
+.activity-log { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.activity-entry { display:grid; grid-template-columns:7px 1fr; gap:8px; align-items:start; color:var(--muted); font-size:10px; line-height:1.4; }
+.activity-entry::before { content:""; width:7px; height:7px; border-radius:50%; background:var(--accent); margin-top:3px; }
+.save-card { display:flex; flex-direction:column; gap:7px; }
+.file-button { display:block; text-align:center; cursor:pointer; }
+
+.modal { width:min(620px,calc(100vw - 28px)); color:var(--text); background:#151925; border:1px solid var(--line-strong); border-radius:20px; box-shadow:var(--shadow); padding:0; }
+.modal::backdrop { background:rgba(2,3,6,.76); backdrop-filter:blur(8px); }
+.modal form { padding:20px; }
+.modal-heading { display:flex; justify-content:space-between; align-items:flex-start; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-top:16px; }
+.field { display:flex; flex-direction:column; gap:6px; color:var(--muted); font-size:10px; }
+.field.full { grid-column:1/-1; }
+.field input, .field select { width:100%; background:rgba(255,255,255,.055); color:white; border:1px solid var(--line); border-radius:10px; padding:10px; }
+.modal-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+.toast-stack { position:fixed; right:20px; bottom:20px; z-index:100; display:flex; flex-direction:column; gap:8px; }
+.toast { max-width:320px; padding:11px 13px; border-radius:12px; background:#202638; border:1px solid var(--line-strong); box-shadow:var(--shadow); font-size:11px; animation:toastIn .22s ease; }
+.toast.success { border-color:rgba(52,229,197,.38); }
+.toast.error { border-color:rgba(255,109,133,.46); }
+@keyframes toastIn { from { transform:translateY(8px); opacity:0; } }
+.photo-hint { display:none; position:fixed; left:50%; bottom:22px; transform:translateX(-50%); z-index:200; padding:10px 14px; border-radius:999px; background:rgba(8,10,16,.75); border:1px solid var(--line); backdrop-filter:blur(12px); font-size:11px; }
+body.photo-mode .topbar, body.photo-mode .panel, body.photo-mode .room-toolbar, body.photo-mode .stage-footer { display:none !important; }
+body.photo-mode .app-shell { height:100vh; display:block; }
+body.photo-mode .stage-wrap, body.photo-mode .room-scroll { height:100vh; }
+body.photo-mode .photo-hint { display:block; }
+
+@media (max-width: 1180px) {
+  .app-shell { grid-template-columns:280px minmax(420px,1fr); }
+  .inspector-panel { display:none; }
+  .topbar { grid-template-columns:220px 1fr auto; }
+  .stats .stat:nth-child(3), .stats .stat:nth-child(4) { display:none; }
+}
+@media (max-width: 820px) {
+  body { overflow:auto; }
+  .topbar { height:auto; grid-template-columns:1fr auto; padding:10px; }
+  .stats { grid-column:1/-1; order:3; width:100%; }
+  .stat { flex:1; }
+  .top-actions .button:not(.accent), .top-actions .ghost { display:none; }
+  .app-shell { height:auto; min-height:calc(100vh - 110px); display:flex; flex-direction:column-reverse; }
+  .library-panel { height:48vh; border-right:0; border-top:1px solid var(--line); }
+  .stage-wrap { min-height:52vh; }
+  .room-toolbar { overflow-x:auto; }
+  .room { padding:28px 16px 46px; }
+  .shelf-unit { min-height:158px; }
+  .placed-item { transform:translateX(-50%) scale(calc(var(--item-scale,1) * .84)); }
+  .stage-footer { display:none; }
+  .card-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media (max-width: 560px) {
+  .brand small { display:none; }
+  .top-actions .button.accent { padding:9px 10px; }
+  .stats { gap:5px; }
+  .stat { min-width:0; padding:6px 8px; }
+  .stat strong { font-size:13px; }
+  .card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .room-toolbar .button { display:none; }
+  .form-grid { grid-template-columns:1fr; }
+  .field.full { grid-column:auto; }
+}
+
+</style>
+</head>
+<body data-room-theme="bedroom" data-light="warm">
+  <header class="topbar">
+    <div class="brand" aria-label="Vitrine Verse">
+      <div class="brand-mark">VV</div>
+      <div>
+        <strong>VITRINE<span>//</span>VERSE</strong>
+        <small>Le musée de ta pop culture</small>
+      </div>
+    </div>
+
+    <div class="stats" aria-live="polite">
+      <div class="stat"><span>Crédits</span><strong id="coinsStat">0</strong></div>
+      <div class="stat"><span>Prestige</span><strong id="prestigeStat">0</strong></div>
+      <div class="stat"><span>Jour</span><strong id="dayStat">1</strong></div>
+      <div class="stat"><span>Propreté</span><strong id="cleanStat">100%</strong></div>
+    </div>
+
+    <div class="top-actions">
+      <button class="button ghost" id="undoBtn" title="Annuler (Ctrl+Z)">↶</button>
+      <button class="button ghost" id="redoBtn" title="Rétablir (Ctrl+Y)">↷</button>
+      <button class="button" id="visitorsBtn">Ouvrir la galerie</button>
+      <button class="button accent" id="photoModeBtn">Mode photo</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="panel library-panel" id="libraryPanel">
+      <div class="panel-tabs" role="tablist">
+        <button class="tab active" data-panel-tab="inventory">Inventaire</button>
+        <button class="tab" data-panel-tab="shop">Boutique</button>
+        <button class="tab" data-panel-tab="collection">Collections</button>
+      </div>
+
+      <section class="panel-view active" data-panel-view="inventory">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Objets possédés</p>
+            <h2>Inventaire</h2>
+          </div>
+          <button class="icon-button" id="openImportBtn" title="Importer une image">＋</button>
+        </div>
+        <label class="search-field">
+          <span>⌕</span>
+          <input id="inventorySearch" type="search" placeholder="Rechercher un objet…" autocomplete="off" />
+        </label>
+        <div class="filter-row" id="inventoryFilters"></div>
+        <div class="card-grid" id="inventoryGrid"></div>
+        <p class="empty-state" id="inventoryEmpty" hidden>Aucun objet ne correspond à ce filtre.</p>
+      </section>
+
+      <section class="panel-view" data-panel-view="shop">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Nouveautés du jour</p>
+            <h2>Boutique</h2>
+          </div>
+        </div>
+        <div class="subtabs">
+          <button class="subtab active" data-shop-tab="items">Objets</button>
+          <button class="subtab" data-shop-tab="shelves">Étagères</button>
+          <button class="subtab" data-shop-tab="themes">Pièces</button>
+        </div>
+        <div class="shop-list" id="shopGrid"></div>
+      </section>
+
+      <section class="panel-view" data-panel-view="collection">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Progression globale</p>
+            <h2>Collections</h2>
+          </div>
+        </div>
+        <div id="collectionList" class="collection-list"></div>
+      </section>
+    </aside>
+
+    <section class="stage-wrap">
+      <div class="room-toolbar">
+        <div class="toolbar-group">
+          <span>Pièce</span>
+          <select id="themeSelect" aria-label="Choisir le décor"></select>
+        </div>
+        <div class="toolbar-group">
+          <span>Lumière</span>
+          <select id="lightSelect" aria-label="Choisir la lumière"></select>
+        </div>
+        <button class="button ghost" id="cleanBtn">Nettoyer</button>
+        <button class="button ghost" id="autoArrangeBtn">Ranger automatiquement</button>
+      </div>
+
+      <div class="room-scroll" id="roomScroll">
+        <div class="room" id="room">
+          <div class="wall-art wall-art-a">PLAY<br />FOREVER</div>
+          <div class="wall-art wall-art-b">★</div>
+          <div class="ambient-glow"></div>
+          <div class="display-shell">
+            <div class="display-header">
+              <div>
+                <p class="eyebrow">Galerie personnelle</p>
+                <h1 id="galleryTitle">Cabinet principal</h1>
+              </div>
+              <div class="display-badge"><span id="displayCount">0</span> pièces exposées</div>
+            </div>
+            <div class="shelves" id="shelves"></div>
+            <div class="floor-shadow"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-footer">
+        <span>Glisse un objet sur une étagère, ou sélectionne-le puis utilise « Placer ».</span>
+        <span id="saveStatus">Sauvegarde locale prête</span>
+      </div>
+    </section>
+
+    <aside class="panel inspector-panel" id="inspectorPanel">
+      <section class="inspector-card" id="inspectorCard">
+        <p class="eyebrow">Sélection</p>
+        <h2>Rien de sélectionné</h2>
+        <p class="muted">Choisis une figurine, un objet ou une pièce exposée pour afficher ses détails.</p>
+      </section>
+
+      <section class="challenge-card">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Défi de vitrine</p>
+            <h3 id="challengeTitle">Trilogie thématique</h3>
+          </div>
+          <span class="reward-pill" id="challengeReward">+180</span>
+        </div>
+        <p id="challengeDescription">Expose trois objets du même univers sur une seule étagère.</p>
+        <div class="progress-track"><span id="challengeProgress"></span></div>
+        <small id="challengeProgressText">0 / 3</small>
+        <button class="button wide" id="claimChallengeBtn" disabled>Réclamer</button>
+      </section>
+
+      <section class="activity-card">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Journal</p>
+            <h3>Activité</h3>
+          </div>
+        </div>
+        <div class="activity-log" id="activityLog"></div>
+      </section>
+
+      <section class="save-card">
+        <button class="button ghost wide" id="exportSaveBtn">Exporter la sauvegarde</button>
+        <label class="button ghost wide file-button">
+          Importer une sauvegarde
+          <input id="importSaveInput" type="file" accept="application/json" hidden />
+        </label>
+        <button class="text-button danger" id="resetBtn">Recommencer la partie</button>
+      </section>
+    </aside>
+  </main>
+
+  <dialog id="importDialog" class="modal">
+    <form method="dialog" id="importForm">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">Atelier de contenu</p>
+          <h2>Importer une figurine ou un objet</h2>
+        </div>
+        <button class="icon-button" value="cancel" formnovalidate>×</button>
+      </div>
+      <p class="muted">Utilise une image PNG ou WebP détourée. Elle sera redimensionnée localement avant d’être ajoutée à ton inventaire.</p>
+      <div class="form-grid">
+        <label class="field full">Image
+          <input id="customImage" type="file" accept="image/png,image/webp,image/jpeg" required />
+        </label>
+        <label class="field">Nom
+          <input id="customName" type="text" maxlength="50" placeholder="Ex. Gardien de la Porte" required />
+        </label>
+        <label class="field">Univers
+          <input id="customUniverse" type="text" maxlength="50" placeholder="Ex. Archives Stellaires" required />
+        </label>
+        <label class="field">Catégorie
+          <select id="customCategory">
+            <option>Figurine</option><option>Buste</option><option>Réplique</option><option>Console</option>
+            <option>Jeu</option><option>Comic</option><option>VHS</option><option>Peluche</option><option>Prop</option><option>Diorama</option>
+          </select>
+        </label>
+        <label class="field">Rareté
+          <select id="customRarity">
+            <option value="common">Commun</option><option value="uncommon">Inhabituel</option><option value="rare" selected>Rare</option>
+            <option value="epic">Épique</option><option value="legendary">Légendaire</option>
+          </select>
+        </label>
+        <label class="field">Poids estimé (kg)
+          <input id="customWeight" type="number" min="0.1" max="20" step="0.1" value="1" required />
+        </label>
+        <label class="field">Taille d’affichage
+          <input id="customSize" type="range" min="56" max="150" value="92" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="button ghost" value="cancel" formnovalidate>Annuler</button>
+        <button class="button accent" value="default" id="confirmImportBtn">Ajouter à l’inventaire</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <div class="photo-hint" id="photoHint">Mode photo — appuie sur Échap pour revenir</div>
+
+  <script>
+/* VITRINE//VERSE — données de contenu originales et remplaçables. */
+window.GAME_DATA = {
+  version: 1,
+  rarity: {
+    common: { label: 'Commun', points: 8 },
+    uncommon: { label: 'Inhabituel', points: 14 },
+    rare: { label: 'Rare', points: 24 },
+    epic: { label: 'Épique', points: 38 },
+    legendary: { label: 'Légendaire', points: 62 }
+  },
+  items: [
+    {
+      id: 'neon_ronin', name: 'Ronin du Néon', category: 'Figurine', universe: 'Chroniques Néon',
+      collection: 'Clan Kage', rarity: 'epic', price: 220, weight: 1.4, width: 78, height: 132,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMjQwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iOTAiIGN5PSIyMjIiIHJ4PSI1NCIgcnk9IjEwIiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjUiLz4KPGcgZmlsdGVyPSJ1cmwoI3NoYWRvdykiPgo8cGF0aCBkPSJNNTggODAgNDAgMTQ1bDE3IDExIDE1LTYxeiIgZmlsbD0iIzFiMjAzMSIvPjxwYXRoIGQ9Im0xMjIgODAgMTggNjUtMTcgMTEtMTUtNjF6IiBmaWxsPSIjMWIyMDMxIi8+CjxwYXRoIGQ9Ik02NSA3NyA1MiAxODBoNzZMMTE1IDc3eiIgZmlsbD0idXJsKCN2aW9sZXQpIiBzdHJva2U9IiNkNWM3ZmYiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNzAgODRoNDBsLTUgNTRINzV6IiBmaWxsPSIjMTcxYzJjIi8+PHBhdGggZD0iTTc4IDkyaDI0bC0yIDM3SDgweiIgZmlsbD0iIzRjZjRlMyIgb3BhY2l0eT0iLjU1IiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KPHBhdGggZD0iTTU2IDE3MSA0NiAyMTdoMzBsMTMtNDZ6TTEyNCAxNzFsMTAgNDZoLTMwbC0xMy00NnoiIGZpbGw9IiMyNTJiM2UiIHN0cm9rZT0iIzhlNzhmZiIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxjaXJjbGUgY3g9IjkwIiBjeT0iNTAiIHI9IjMwIiBmaWxsPSIjMjIyODNhIiBzdHJva2U9IiNjNWI4ZmYiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNTcgNTNoNjZsLTkgMjZINjZ6IiBmaWxsPSIjMTcxYTI4Ii8+PHBhdGggZD0iTTYzIDUyaDU0IiBzdHJva2U9IiM1N2YzZTAiIHN0cm9rZS13aWR0aD0iNSIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjxwYXRoIGQ9Ik01NiAzMyA5MCA4bDM0IDI1LTE3LTQtMTcgOS0xNy05eiIgZmlsbD0iIzJkMzM0OCIgc3Ryb2tlPSIjOWY4YWZmIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTExOCA5NyAxNTAgNDIiIHN0cm9rZT0iIzhjZjlmZiIgc3Ryb2tlLXdpZHRoPSI2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIGZpbHRlcj0idXJsKCNnbG93KSIvPjxwYXRoIGQ9Ik0xNDMgMzhsMTYtMTEiIHN0cm9rZT0iI2Q2ZmJmZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxyZWN0IHg9IjYwIiB5PSIxNzciIHdpZHRoPSI2MCIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9IiMxMDEzMWQiLz48cGF0aCBkPSJNNjUgMTgzaDUwIiBzdHJva2U9IiM1MmVhZGEiIHN0cm9rZS13aWR0aD0iMyIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjwvZz4KPC9zdmc+', description: 'Un samouraï urbain dont l’armure réagit aux éclairages colorés.',
+      tags: ['figurine', 'cyber', 'samouraï', 'néon']
+    },
+    {
+      id: 'orbit_guardian', name: 'Gardienne Orbitale', category: 'Figurine', universe: 'Frontière Orbitale',
+      collection: 'Sentinelles du Périgée', rarity: 'rare', price: 165, weight: 1.2, width: 74, height: 128,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMjQwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iOTAiIGN5PSIyMjIiIHJ4PSI1MiIgcnk9IjkiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yNSIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Ik01NSA4NiA0MyAxNTZsMjYgOCAxNC03M3pNMTI1IDg2bDEyIDcwLTI2IDgtMTQtNzN6IiBmaWxsPSIjZTdlZGY1IiBzdHJva2U9IiM2MzcxODgiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNjYgNzYgNTUgMTgyaDcwTDExNCA3NnoiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiNlZWY3ZmYiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNzMgOTRoMzRsNSA1NC0yMiAxNy0yMi0xN3oiIGZpbGw9IiMyMDM2NGYiLz48Y2lyY2xlIGN4PSI5MCIgY3k9IjExOCIgcj0iMTQiIGZpbGw9IiM0MmQ2ZmYiIG9wYWNpdHk9Ii44IiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KPHBhdGggZD0iTTYzIDE3NSA0OCAyMTdoMzNsOS00MnpNMTE3IDE3NWwxNSA0Mkg5OWwtOS00MnoiIGZpbGw9IiNkOWUyZWMiIHN0cm9rZT0iIzY0NzE4NyIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxjaXJjbGUgY3g9IjkwIiBjeT0iNTIiIHI9IjMxIiBmaWxsPSIjZThlZWY1IiBzdHJva2U9IiM2MzcxODgiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNjEgNDZjMTAtMTggNDgtMjEgNTggMHYyNEg2MXoiIGZpbGw9IiMzMzQ4NjEiLz48cGF0aCBkPSJNNjcgNTBoNDZ2MTVINjd6IiBmaWxsPSIjNThkYmZmIiBvcGFjaXR5PSIuNzYiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNMTIzIDExMmgyNHYxMGgtMjR6IiBmaWxsPSIjZjFmNWY5Ii8+PGNpcmNsZSBjeD0iMTUxIiBjeT0iMTE3IiByPSI4IiBmaWxsPSIjZmZjZDVlIiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KPHBhdGggZD0iTTU4IDE4OGg2NCIgc3Ryb2tlPSIjNGVkOGZmIiBzdHJva2Utd2lkdGg9IjQiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8L2c+Cjwvc3ZnPg==', description: 'Une exploratrice en armure blanche issue des confins du système solaire.',
+      tags: ['figurine', 'espace', 'armure']
+    },
+    {
+      id: 'pixel_mage', name: 'Mage 16-Bit', category: 'Figurine', universe: 'Royaume 16-Bit',
+      collection: 'Compagnie du Pixel', rarity: 'uncommon', price: 92, weight: 0.7, width: 68, height: 112,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNzAgMjIwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iODUiIGN5PSIyMDQiIHJ4PSI0OCIgcnk9IjkiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yMyIvPgo8ZyBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIGZpbHRlcj0idXJsKCNzaGFkb3cpIj4KPHBhdGggZD0iTTU0IDcwaDYydjE4aDE1djkzSDM5Vjg4aDE1eiIgZmlsbD0iIzU3NDRjOSIvPjxwYXRoIGQ9Ik02NSA4OWg0MHY0Nkg2NXoiIGZpbGw9IiNmMGM1YTAiLz4KPHBhdGggZD0iTTU1IDYwaDE1VjQ1aDE1VjMwaDE1djE1aDE1djE1aDE1djE1SDQwVjYweiIgZmlsbD0iIzJjMjY2OCIvPjxyZWN0IHg9IjcwIiB5PSIxMDEiIHdpZHRoPSI5IiBoZWlnaHQ9IjkiIGZpbGw9IiMxODI0M2QiLz48cmVjdCB4PSI5MSIgeT0iMTAxIiB3aWR0aD0iOSIgaGVpZ2h0PSI5IiBmaWxsPSIjMTgyNDNkIi8+CjxwYXRoIGQ9Ik0zOSAxMjBIMjJ2NTBoMTd6TTEzMSAxMjBoMTd2NTBoLTE3eiIgZmlsbD0iIzU3NDRjOSIvPjxwYXRoIGQ9Ik01OCAxMzVoNTR2NTBINTh6IiBmaWxsPSIjMzMyOTdkIi8+CjxwYXRoIGQ9Ik01NCAxODFoMjh2MjNINDZ6TTg4IDE4MWgyOGw4IDIzSDg4eiIgZmlsbD0iIzI1MjA0ZiIvPgo8cGF0aCBkPSJNMTQ0IDcwaDh2MTA2aC04eiIgZmlsbD0iIzhjNWIyZiIvPjxwYXRoIGQ9Ik0xMzEgNjFoMzR2MzRoLTM0eiIgZmlsbD0iIzQyZjBkZCIgb3BhY2l0eT0iLjkiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNNzEgMTE5aDI4djdINzF6IiBmaWxsPSIjYzk2ZDhiIi8+CjwvZz4KPC9zdmc+', description: 'Un mage carré capable de transformer les bugs en sorts.',
+      tags: ['figurine', 'fantasy', 'pixel']
+    },
+    {
+      id: 'void_cat', name: 'Chat du Vide', category: 'Figurine', universe: 'Anomalies du Vide',
+      collection: 'Bestiaire Impossible', rarity: 'rare', price: 145, weight: 0.8, width: 82, height: 104,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMjEwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iOTEiIGN5PSIxOTQiIHJ4PSI1NyIgcnk9IjkiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yNCIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Ik00NiA3MiA1NSAyOGwzMSAzMXpNMTM0IDcybC05LTQ0LTMxIDMxeiIgZmlsbD0iIzI4MjE0NyIgc3Ryb2tlPSIjOGE3M2ZmIiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTkwIDQ3Yy0zOSAwLTU4IDI0LTUyIDU4IDQgMjYgMjAgMzggMjggNDUtMTcgNy0yMyAyMC0yMCAzNWg5MWMzLTE4LTktMzEtMjYtMzggMTQtMTAgMjctMjggMjktNDggMy0zMi0xOC01Mi01MC01MnoiIGZpbGw9IiMyMTFjM2EiIHN0cm9rZT0iIzgwNmVmZiIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxlbGxpcHNlIGN4PSI2OSIgY3k9IjkzIiByeD0iMTIiIHJ5PSIxNiIgZmlsbD0iIzcwZjdlYyIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+PGVsbGlwc2UgY3g9IjExMSIgY3k9IjkzIiByeD0iMTIiIHJ5PSIxNiIgZmlsbD0iIzcwZjdlYyIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjxjaXJjbGUgY3g9IjY5IiBjeT0iOTUiIHI9IjQiIGZpbGw9IiMxMTE0MjciLz48Y2lyY2xlIGN4PSIxMTEiIGN5PSI5NSIgcj0iNCIgZmlsbD0iIzExMTQyNyIvPjxwYXRoIGQ9Ik04NCAxMTVsNiA2IDYtNiIgZmlsbD0iI2Q5OGNmZiIvPgo8cGF0aCBkPSJNMTIyIDE0MmMzNi03IDQ2IDcgMzUgMjItOCAxMS0yNyA1LTI1LTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzgwNmVmZiIgc3Ryb2tlLXdpZHRoPSI5IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPGNpcmNsZSBjeD0iOTAiIGN5PSI3NCIgcj0iNSIgZmlsbD0iI2RmYzdmZiIvPjxjaXJjbGUgY3g9IjU0IiBjeT0iMTIyIiByPSIzIiBmaWxsPSIjNjRlNWZmIi8+PGNpcmNsZSBjeD0iMTI2IiBjeT0iMTI2IiByPSIzIiBmaWxsPSIjZmY3OGQzIi8+CjwvZz4KPC9zdmc+', description: 'Un félin cosmique qui semble regarder derrière l’écran.',
+      tags: ['figurine', 'chat', 'cosmique']
+    },
+    {
+      id: 'mecha_scout', name: 'Éclaireur Mécha M-08', category: 'Figurine', universe: 'Mecha Rally',
+      collection: 'Écurie Ferromobile', rarity: 'epic', price: 245, weight: 2.3, width: 96, height: 126,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjMwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iMTAwIiBjeT0iMjE0IiByeD0iNjYiIHJ5PSIxMCIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iLjI3Ii8+CjxnIGZpbHRlcj0idXJsKCNzaGFkb3cpIj4KPHBhdGggZD0iTTYwIDc2IDMxIDk1bDEyIDUyIDMxLTl6TTE0MCA3NmwyOSAxOS0xMiA1Mi0zMS05eiIgZmlsbD0iIzM5NDQ1YSIgc3Ryb2tlPSIjYTZiMGM0IiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0iTTYyIDU0aDc2bDEzIDk5LTUxIDMwLTUxLTMweiIgZmlsbD0idXJsKCNtZXRhbCkiIHN0cm9rZT0iI2RhZTJlZiIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik03MSA2OGg1OGw4IDU3LTM3IDI0LTM3LTI0eiIgZmlsbD0iIzI5MzM0OCIvPjxwYXRoIGQ9Ik03OSA3Nmg0Mmw1IDI4SDc0eiIgZmlsbD0iIzY0ZTVmZiIgb3BhY2l0eT0iLjc0IiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KPHBhdGggZD0iTTY4IDE1MSA0OSAyMDVoMzdsMTQtMzd6TTEzMiAxNTFsMTkgNTRoLTM3bC0xNC0zN3oiIGZpbGw9IiMzZDQ4NWUiIHN0cm9rZT0iIzlkYThiYSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik00NSAxMDZIMTd2MTNoMzB6TTE1NSAxMDZoMjh2MTNoLTMweiIgZmlsbD0iI2ZmOGM0ZiIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjxjaXJjbGUgY3g9IjEwMCIgY3k9IjQzIiByPSIyNCIgZmlsbD0iIzM2M2Y1MiIgc3Ryb2tlPSIjYTliMmMzIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNODAgNDJoNDAiIHN0cm9rZT0iI2ZmNmM2YyIgc3Ryb2tlLXdpZHRoPSI2IiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KPHBhdGggZD0iTTg4IDE4MGgyNCIgc3Ryb2tlPSIjZmY4YjRmIiBzdHJva2Utd2lkdGg9IjUiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8L2c+Cjwvc3ZnPg==', description: 'Un mécha compact prévu pour la course et la reconnaissance.',
+      tags: ['figurine', 'mécha', 'robot']
+    },
+    {
+      id: 'crypt_keeper', name: 'Buste du Gardien Cryptique', category: 'Buste', universe: 'Manoir Cryptique',
+      collection: 'Galerie Interdite', rarity: 'rare', price: 155, weight: 2.0, width: 88, height: 105,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTAgMjEwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iOTUiIGN5PSIxOTUiIHJ4PSI2MiIgcnk9IjEwIiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjgiLz4KPGcgZmlsdGVyPSJ1cmwoI3NoYWRvdykiPgo8cGF0aCBkPSJNMzYgMTgxYzctNDEgMjctNjEgNTktNjFzNTIgMjAgNTkgNjF6IiBmaWxsPSIjMmYyMjM0IiBzdHJva2U9IiM5ODcwYTMiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNTggNzljMC0zNSAxOC01OCAzNy01OHMzNyAyMyAzNyA1OGMwIDMxLTE3IDU1LTM3IDU1UzU4IDExMCA1OCA3OXoiIGZpbGw9IiNjNWI5YTkiIHN0cm9rZT0iIzNjMzEzOCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik01MSA3NWM0LTQwIDIyLTY1IDQ0LTY1czQwIDI1IDQ0IDY1bC0xNy0yMi05IDE5LTE4LTI4LTE4IDI4LTktMTl6IiBmaWxsPSIjMjIxOTI3Ii8+CjxwYXRoIGQ9Ik03MCA4MGgyMGwtNSAxMUg2OHpNMTAwIDgwaDIwbDIgMTFoLTE3eiIgZmlsbD0iIzE1MTIxYSIvPjxjaXJjbGUgY3g9IjgwIiBjeT0iODUiIHI9IjMiIGZpbGw9IiNmZjViN2UiIGZpbHRlcj0idXJsKCNnbG93KSIvPjxjaXJjbGUgY3g9IjExMCIgY3k9Ijg1IiByPSIzIiBmaWxsPSIjZmY1YjdlIiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KPHBhdGggZD0iTTgyIDExMGM5IDggMTcgOCAyNiAwIiBmaWxsPSJub25lIiBzdHJva2U9IiM0ZjM0MzkiIHN0cm9rZS13aWR0aD0iMyIvPjxwYXRoIGQ9Ik02NiAxNDcgOTUgMTgxbDI5LTM0IiBmaWxsPSIjMTUxMzFjIiBzdHJva2U9IiM3ZDVjOGEiIHN0cm9rZS13aWR0aD0iMyIvPgo8cmVjdCB4PSIzMSIgeT0iMTgxIiB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEzIiByeD0iNSIgZmlsbD0iIzRhMzU0ZCIvPjxyZWN0IHg9IjQ4IiB5PSIxOTAiIHdpZHRoPSI5NCIgaGVpZ2h0PSIxMCIgcng9IjMiIGZpbGw9IiMyMDE4MjAiLz4KPC9nPgo8L3N2Zz4=', description: 'Le gardien d’un musée qui ne devrait ouvrir qu’à minuit.',
+      tags: ['buste', 'horreur', 'gothique']
+    },
+    {
+      id: 'retro_console', name: 'Console Nova-32', category: 'Console', universe: 'Archive 90',
+      collection: 'Matériel Rétro', rarity: 'uncommon', price: 84, weight: 1.8, width: 96, height: 66,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMjAgMTUwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iMTEwIiBjeT0iMTMyIiByeD0iODIiIHJ5PSIxMCIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iLjI1Ii8+CjxnIGZpbHRlcj0idXJsKCNzaGFkb3cpIj4KPHBhdGggZD0iTTMxIDM4aDE1OGwxNSA3NkgxNnoiIGZpbGw9IiM1ZDYwNzAiIHN0cm9rZT0iI2QxZDVkZiIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik00MiA1MGgxMzZsOCA0NUgzNHoiIGZpbGw9IiMyNDI4MzciLz4KPHJlY3QgeD0iNTQiIHk9IjYwIiB3aWR0aD0iNDYiIGhlaWdodD0iMjQiIHJ4PSI0IiBmaWxsPSIjMTExNDFlIi8+PHBhdGggZD0iTTYyIDcyaDMwIiBzdHJva2U9IiM1OGU2ZmYiIHN0cm9rZS13aWR0aD0iNSIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjxjaXJjbGUgY3g9IjEzOSIgY3k9IjcwIiByPSI5IiBmaWxsPSIjZmY2YjhlIi8+PGNpcmNsZSBjeD0iMTYzIiBjeT0iNzAiIHI9IjkiIGZpbGw9IiNmZmQ0NWMiLz4KPHBhdGggZD0iTTUyIDEwNWgxMTYiIHN0cm9rZT0iIzJiMmYzYyIgc3Ryb2tlLXdpZHRoPSI3Ii8+PHJlY3QgeD0iNzkiIHk9IjEwNiIgd2lkdGg9IjYyIiBoZWlnaHQ9IjkiIHJ4PSI0IiBmaWxsPSIjMTExNDFjIi8+CjxwYXRoIGQ9Ik0xOSAxMTVoMTgyIiBzdHJva2U9IiMxZTIyMzAiIHN0cm9rZS13aWR0aD0iNSIvPgo8L2c+Cjwvc3ZnPg==', description: 'Une console culte aux boutons surdimensionnés.',
+      tags: ['console', 'rétro', 'jeu vidéo']
+    },
+    {
+      id: 'arcade_cart', name: 'Cartouche Turbo Quest', category: 'Jeu', universe: 'Archive 90',
+      collection: 'Matériel Rétro', rarity: 'common', price: 38, weight: 0.2, width: 58, height: 70,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNDAgMTcwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iNzAiIGN5PSIxNTUiIHJ4PSI0MyIgcnk9IjgiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yNCIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Ik0yNyAyMGg4NnYxMjFIMjd6IiBmaWxsPSIjMzUzYTRiIiBzdHJva2U9IiNhN2FmYmQiIHN0cm9rZS13aWR0aD0iMyIvPjxwYXRoIGQ9Ik0zNyAzMWg2NnY3MkgzN3oiIGZpbGw9InVybCgjdmlvbGV0KSIvPgo8cGF0aCBkPSJNNDUgODMgNjYgNDlsMTcgMTggMTItMTh2NDNINDV6IiBmaWxsPSIjMTUxOTMxIi8+PGNpcmNsZSBjeD0iNjMiIGN5PSI1OCIgcj0iOSIgZmlsbD0iIzVkZjRlMiIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjxwYXRoIGQ9Ik00NSAxMTJoNTAiIHN0cm9rZT0iI2U1ZTdlZiIgc3Ryb2tlLXdpZHRoPSI2Ii8+PHBhdGggZD0iTTQ1IDEyNWgzNSIgc3Ryb2tlPSIjN2Y4Nzk3IiBzdHJva2Utd2lkdGg9IjUiLz4KPHBhdGggZD0iTTQ1IDE0MXYxMk01OCAxNDF2MTJNNzEgMTQxdjEyTTg0IDE0MXYxMk05NyAxNDF2MTIiIHN0cm9rZT0iI2Q1YTg0YyIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjwvZz4KPC9zdmc+', description: 'Une cartouche robuste couverte d’autocollants de tournois.',
+      tags: ['cartouche', 'rétro', 'jeu vidéo']
+    },
+    {
+      id: 'star_helmet', name: 'Casque du Périgée', category: 'Réplique', universe: 'Frontière Orbitale',
+      collection: 'Sentinelles du Périgée', rarity: 'epic', price: 270, weight: 2.8, width: 112, height: 102,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMjAgMTkwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iMTEwIiBjeT0iMTc0IiByeD0iNzMiIHJ5PSIxMCIgZmlsbD0iIzAwMCIgb3BhY2l0eT0iLjI2Ii8+CjxnIGZpbHRlcj0idXJsKCNzaGFkb3cpIj4KPHBhdGggZD0iTTQwIDEwN2MwLTU4IDI3LTkxIDcwLTkxczcwIDMzIDcwIDkxbC0xNiA1Mkg1NnoiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiNlZGYzZmEiIHN0cm9rZS13aWR0aD0iNCIvPgo8cGF0aCBkPSJNNTYgODZjOC0zNyAyOS01NCA1NC01NHM0NiAxNyA1NCA1NGwtMTIgNDJINjh6IiBmaWxsPSIjMWMzNDQ5IiBzdHJva2U9IiM2NWRmZmYiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNzAgODNjMTMtMjUgNjItMjcgODAgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOGJmNmZmIiBzdHJva2Utd2lkdGg9IjgiIG9wYWNpdHk9Ii43NSIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjxwYXRoIGQ9Ik01NCAxMjFoMjB2MzFINTR6TTE0NiAxMjFoMjB2MzFoLTIweiIgZmlsbD0iIzM4NDk1YiIvPgo8cGF0aCBkPSJNNzcgMTQxaDY2IiBzdHJva2U9IiM1NDYxNzMiIHN0cm9rZS13aWR0aD0iOCIvPjxjaXJjbGUgY3g9IjExMCIgY3k9IjE0NiIgcj0iNyIgZmlsbD0iI2ZmZDQ2MiIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjwvZz4KPC9zdmc+', description: 'Une réplique de casque spatial avec visière polarisée.',
+      tags: ['casque', 'espace', 'réplique']
+    },
+    {
+      id: 'plasma_blaster', name: 'Propulseur Plasma P-7', category: 'Réplique', universe: 'Frontière Orbitale',
+      collection: 'Arsenal de Convention', rarity: 'rare', price: 172, weight: 1.1, width: 120, height: 70,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjAgMTUwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iMTI4IiBjeT0iMTMyIiByeD0iOTUiIHJ5PSI5IiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjUiLz4KPGcgZmlsdGVyPSJ1cmwoI3NoYWRvdykiPgo8cGF0aCBkPSJNMzQgNDdoMTQ2bDM0IDI2LTI4IDMxSDk1bC0xNyAzMEg1M2wxMS0zOEgzNHoiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiNkY2UzZWQiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNDcgNTloMTI4bDE5IDE1LTE1IDE2SDQ3eiIgZmlsbD0iIzI3MzM0NiIvPjxwYXRoIGQ9Ik02MCA2OGg5MSIgc3Ryb2tlPSIjNTdlOWZmIiBzdHJva2Utd2lkdGg9IjciIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNOTcgMTAxaDM5bC0xMCAzM0g3OHoiIGZpbGw9IiMzNDNiNDkiLz48cGF0aCBkPSJNMjAxIDY2aDM1bDEyIDEwLTEyIDExaC0zNXoiIGZpbGw9IiM0ZTVkNzEiLz48Y2lyY2xlIGN4PSIyMjAiIGN5PSI3NiIgcj0iNiIgZmlsbD0iI2ZmNmI4ZSIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjxwYXRoIGQ9Ik0zMiA1NSAxMiA0OHY0OGwyMC03eiIgZmlsbD0iIzU1NjQ3NyIvPgo8L2c+Cjwvc3ZnPg==', description: 'Une réplique lumineuse totalement inoffensive.',
+      tags: ['réplique', 'espace', 'accessoire']
+    },
+    {
+      id: 'spellbook', name: 'Grimoire des 256 Sorts', category: 'Livre', universe: 'Royaume 16-Bit',
+      collection: 'Compagnie du Pixel', rarity: 'rare', price: 126, weight: 1.0, width: 76, height: 82,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTcwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iOTAiIGN5PSIxNTMiIHJ4PSI2MSIgcnk9IjgiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yNCIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Ik0zMyAyN2gxMDJsMTQgMTZ2OTBsLTE2IDE0SDMzeiIgZmlsbD0iIzNjMjc2YiIgc3Ryb2tlPSIjYzJhNWZmIiBzdHJva2Utd2lkdGg9IjQiLz48cGF0aCBkPSJNNDUgMzhoODJsMTAgMTF2NzJsLTExIDExSDQ1eiIgZmlsbD0iIzJiMWI1MSIvPgo8cGF0aCBkPSJNODcgNTMgNjYgNzVsMjEgMjIgMjEtMjJ6IiBmaWxsPSIjNWJmMGRkIiBvcGFjaXR5PSIuODIiIGZpbHRlcj0idXJsKCNnbG93KSIvPjxjaXJjbGUgY3g9Ijg3IiBjeT0iNzUiIHI9IjgiIGZpbGw9IiMyMDE4NDMiLz4KPHBhdGggZD0iTTU0IDExMmg2OCIgc3Ryb2tlPSIjYTg5NWQ2IiBzdHJva2Utd2lkdGg9IjQiLz48cGF0aCBkPSJNMzIgMjcgMjEgMzZ2MTAzbDEyIDgiIGZpbGw9IiMyNTE3M2YiLz4KPHBhdGggZD0iTTMzIDM5aC05TTMzIDYyaC05TTMzIDg1aC05TTMzIDEwOGgtOU0zMyAxMzFoLTkiIHN0cm9rZT0iI2UxYzk2YiIgc3Ryb2tlLXdpZHRoPSI1Ii8+CjwvZz4KPC9zdmc+', description: 'Chaque page ressemble à un niveau secret.',
+      tags: ['livre', 'fantasy', 'pixel']
+    },
+    {
+      id: 'holo_crystal', name: 'Cristal Holographique', category: 'Prop', universe: 'Chroniques Néon',
+      collection: 'Reliques Synthétiques', rarity: 'rare', price: 138, weight: 0.9, width: 70, height: 102,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNzAgMjEwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iODUiIGN5PSIxOTEiIHJ4PSI1NCIgcnk9IjkiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yNCIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Im04NSAxOCAzOSA1Ny0xOCA3NEg2NEw0NiA3NXoiIGZpbGw9InVybCgjY3lhbikiIG9wYWNpdHk9Ii44MiIgc3Ryb2tlPSIjYzdmZGZmIiBzdHJva2Utd2lkdGg9IjMiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJtODUgMTggMSAxMzFNNDYgNzVoNzhNNjQgMTQ5IDg1IDc1bDIxIDc0IiBmaWxsPSJub25lIiBzdHJva2U9IiNkN2ZkZmYiIHN0cm9rZS13aWR0aD0iMiIgb3BhY2l0eT0iLjciLz4KPHBhdGggZD0iTTQ4IDE0OGg3NGwxNSAyNkgzM3oiIGZpbGw9IiMzMDM2NGEiIHN0cm9rZT0iIzhiOTRhYSIgc3Ryb2tlLXdpZHRoPSIzIi8+PHJlY3QgeD0iNDMiIHk9IjE3MyIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjEzIiByeD0iNCIgZmlsbD0iIzE1MTgyNCIvPgo8cGF0aCBkPSJNNTQgMTc4aDYyIiBzdHJva2U9IiM2ZWY4ZTYiIHN0cm9rZS13aWR0aD0iNCIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+CjwvZz4KPC9zdmc+', description: 'Une relique luminescente montée sur un socle miroir.',
+      tags: ['cristal', 'néon', 'prop']
+    },
+    {
+      id: 'comic_stack', name: 'Pile de Comics Multivers', category: 'Comic', universe: 'Multivers Papier',
+      collection: 'Premières Éditions', rarity: 'common', price: 46, weight: 1.3, width: 86, height: 58,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMTAgMTQwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iMTA1IiBjeT0iMTI2IiByeD0iNzYiIHJ5PSI4IiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjIiLz4KPGcgZmlsdGVyPSJ1cmwoI3NoYWRvdykiPgo8cGF0aCBkPSJNMzQgODFoMTQwbDE0IDMwSDQ3eiIgZmlsbD0iIzVlNGFjYiIgc3Ryb2tlPSIjYzhiZGZmIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNNDUgNTVoMTM3bC04IDI5SDM0eiIgZmlsbD0iI2U5NWI4NyIgc3Ryb2tlPSIjZmZjMmQ0IiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNMjggMzBoMTM3bDE3IDI4SDQ1eiIgZmlsbD0iIzQ2Y2RiOCIgc3Ryb2tlPSIjYmJmZmY1IiBzdHJva2Utd2lkdGg9IjMiLz4KPHBhdGggZD0ibTY2IDM3IDE3IDgtMTIgN3pNMTEyIDM1bDIxIDEyLTE3IDd6IiBmaWxsPSIjMTUyMzNjIi8+PGNpcmNsZSBjeD0iMTQ5IiBjeT0iNDQiIHI9IjgiIGZpbGw9IiNmZmQ3NWQiLz4KPHBhdGggZD0iTTU2IDY3aDg5TTY1IDkzaDc2IiBzdHJva2U9IiMxZTI2MzkiIHN0cm9rZS13aWR0aD0iNSIgb3BhY2l0eT0iLjciLz4KPC9nPgo8L3N2Zz4=', description: 'Des numéros colorés, classés dans un ordre très personnel.',
+      tags: ['comic', 'papier', 'collection']
+    },
+    {
+      id: 'vhs_night', name: 'VHS Nuit 13', category: 'VHS', universe: 'Manoir Cryptique',
+      collection: 'Archives Maudites', rarity: 'uncommon', price: 64, weight: 0.4, width: 70, height: 82,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNzAgMTg1IiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iODUiIGN5PSIxNjkiIHJ4PSI1MiIgcnk9IjgiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yMyIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Ik0zNSAxN2gxMDB2MTQySDM1eiIgZmlsbD0iIzFkMjAyYiIgc3Ryb2tlPSIjOGE5MGEwIiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNNDUgMjdoODB2NzVINDV6IiBmaWxsPSIjNGIyMDRiIi8+CjxjaXJjbGUgY3g9Ijg1IiBjeT0iNjAiIHI9IjI1IiBmaWxsPSIjMTcxNDFmIi8+PHBhdGggZD0iTTg1IDM2IDk4IDYxIDg0IDg3IDcwIDYweiIgZmlsbD0iI2ZmNWY4MyIgb3BhY2l0eT0iLjgiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNNDggMTEyaDc0IiBzdHJva2U9IiNlNWU4ZWYiIHN0cm9rZS13aWR0aD0iNiIvPjxwYXRoIGQ9Ik00OCAxMjZoNTIiIHN0cm9rZT0iIzdiODE5MCIgc3Ryb2tlLXdpZHRoPSI1Ii8+CjxyZWN0IHg9IjQzIiB5PSIxNDMiIHdpZHRoPSI4NCIgaGVpZ2h0PSIxMCIgcng9IjQiIGZpbGw9IiMwZTEwMTciLz4KPC9nPgo8L3N2Zz4=', description: 'La jaquette promet une fin que personne ne se rappelle.',
+      tags: ['vhs', 'horreur', 'rétro']
+    },
+    {
+      id: 'alien_plush', name: 'Peluche Mini-Visiteur', category: 'Peluche', universe: 'Anomalies du Vide',
+      collection: 'Bestiaire Impossible', rarity: 'uncommon', price: 78, weight: 0.4, width: 76, height: 94,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMjAwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iOTAiIGN5PSIxODUiIHJ4PSI1NSIgcnk9IjkiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yMyIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Ik01NSA4OGMtNS0zMyAxMC02NSAzNS02NXM0MCAzMiAzNSA2NWMyNCAxNyAyNSA1NiA3IDc2LTEzIDE1LTcxIDE1LTg0IDAtMTgtMjAtMTctNTkgNy03NnoiIGZpbGw9IiM1YWI3YTUiIHN0cm9rZT0iI2I4ZmZmMCIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxlbGxpcHNlIGN4PSI3MiIgY3k9Ijc1IiByeD0iMTUiIHJ5PSIyMCIgZmlsbD0iIzE5MjIzNCIvPjxlbGxpcHNlIGN4PSIxMDgiIGN5PSI3NSIgcng9IjE1IiByeT0iMjAiIGZpbGw9IiMxOTIyMzQiLz48Y2lyY2xlIGN4PSI3NiIgY3k9IjcxIiByPSI0IiBmaWxsPSIjZDdmZmY4Ii8+PGNpcmNsZSBjeD0iMTEyIiBjeT0iNzEiIHI9IjQiIGZpbGw9IiNkN2ZmZjgiLz4KPHBhdGggZD0iTTgyIDEwNGM1IDUgMTEgNSAxNiAwIiBmaWxsPSJub25lIiBzdHJva2U9IiMyODRjNDgiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNDUgMTIwIDIzIDE0NU0xMzUgMTIwbDIyIDI1IiBzdHJva2U9IiM1YWI3YTUiIHN0cm9rZS13aWR0aD0iMTgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8cGF0aCBkPSJNNzMgMTY2djE3TTEwNyAxNjZ2MTciIHN0cm9rZT0iIzRiOWI4ZSIgc3Ryb2tlLXdpZHRoPSIxOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjwvZz4KPC9zdmc+', description: 'Une créature extraterrestre beaucoup trop douce pour être honnête.',
+      tags: ['peluche', 'alien', 'mignon']
+    },
+    {
+      id: 'pinboard', name: 'Cadre de Pins Portails', category: 'Pins', universe: 'Multivers Papier',
+      collection: 'Petits Trésors', rarity: 'uncommon', price: 72, weight: 0.8, width: 94, height: 86,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTAgMTgwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iOTUiIGN5PSIxNjYiIHJ4PSI2MiIgcnk9IjgiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yMiIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxyZWN0IHg9IjI4IiB5PSIxOCIgd2lkdGg9IjEzNCIgaGVpZ2h0PSIxMzciIHJ4PSIxMCIgZmlsbD0iIzRhMzQyYyIgc3Ryb2tlPSIjYzg5YTZjIiBzdHJva2Utd2lkdGg9IjUiLz48cmVjdCB4PSI0MiIgeT0iMzIiIHdpZHRoPSIxMDYiIGhlaWdodD0iMTA5IiByeD0iNSIgZmlsbD0iIzFmMjQzMiIvPgo8Y2lyY2xlIGN4PSI2NiIgY3k9IjU4IiByPSIxNCIgZmlsbD0iIzhiNzVmZiIvPjxwYXRoIGQ9Im02NiA0NiA2IDEyLTYgMTItNi0xMnoiIGZpbGw9IiNkOGNmZmYiLz4KPGNpcmNsZSBjeD0iMTExIiBjeT0iNTciIHI9IjE1IiBmaWxsPSIjNDJkN2M0Ii8+PHBhdGggZD0iTTEwMSA1N2gyME0xMTEgNDd2MjAiIHN0cm9rZT0iI2U4ZmZmYiIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxjaXJjbGUgY3g9IjcyIiBjeT0iMTA1IiByPSIxNyIgZmlsbD0iI2YwNjA4OCIvPjxwYXRoIGQ9Im02MiAxMDkgMTAtMjIgMTAgMjJ6IiBmaWxsPSIjZmZkMmRmIi8+CjxjaXJjbGUgY3g9IjEyMCIgY3k9IjEwNyIgcj0iMTUiIGZpbGw9IiNlMmI5NDYiLz48cGF0aCBkPSJNMTEwIDEwOGgyME0xMjAgOTh2MjAiIHN0cm9rZT0iI2ZmZjRiZiIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjwvZz4KPC9zdmc+', description: 'Un cadre rempli de symboles de mondes imaginaires.',
+      tags: ['pins', 'cadre', 'collection']
+    },
+    {
+      id: 'moon_diorama', name: 'Diorama Base Lunaire', category: 'Diorama', universe: 'Frontière Orbitale',
+      collection: 'Sentinelles du Périgée', rarity: 'legendary', price: 440, weight: 4.5, width: 142, height: 112,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyODAgMTkwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iMTQwIiBjeT0iMTc0IiByeD0iMTA1IiByeT0iMTEiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4yOCIvPgo8ZyBmaWx0ZXI9InVybCgjc2hhZG93KSI+CjxwYXRoIGQ9Ik0yNyAxNDVjMjItNTkgNjQtODMgMTEzLTgzczkxIDI0IDExMyA4M3oiIGZpbGw9IiM3NDdiODkiIHN0cm9rZT0iI2QyZDZkZSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxlbGxpcHNlIGN4PSI5NiIgY3k9IjExOSIgcng9IjMxIiByeT0iMTIiIGZpbGw9IiM0ZDUzNWYiLz48ZWxsaXBzZSBjeD0iMTkwIiBjeT0iMTMzIiByeD0iMjIiIHJ5PSI4IiBmaWxsPSIjNTA1NjYzIi8+CjxwYXRoIGQ9Ik0xMTUgNThoNjJsMTIgNjdoLTg2eiIgZmlsbD0iI2RkZTRlZCIgc3Ryb2tlPSIjNmQ3Nzg2IiBzdHJva2Utd2lkdGg9IjMiLz48cGF0aCBkPSJNMTIyIDcyaDQ3bDYgMjdoLTU5eiIgZmlsbD0iIzJjNDg2MCIvPjxwYXRoIGQ9Ik0xMzEgNzdoMzAiIHN0cm9rZT0iIzY4ZTZmZiIgc3Ryb2tlLXdpZHRoPSI1IiBmaWx0ZXI9InVybCgjZ2xvdykiLz4KPHBhdGggZD0iTTEwOSAxMjZoNzJsMTYgMjFIOTN6IiBmaWxsPSIjNDI0YTU4Ii8+CjxwYXRoIGQ9Ik01NyAxMTFoNDVsMTMgMTlINDl6IiBmaWxsPSIjYjhjMWNlIi8+PGNpcmNsZSBjeD0iNjIiIGN5PSIxMzUiIHI9IjEyIiBmaWxsPSIjMmUzNDNlIi8+PGNpcmNsZSBjeD0iMTAxIiBjeT0iMTM1IiByPSIxMiIgZmlsbD0iIzJlMzQzZSIvPjxwYXRoIGQ9Ik03NCAxMDRoMTZsOSAxN0g2NXoiIGZpbGw9IiMzNDRmNjgiLz4KPHBhdGggZD0iTTIyNSA3MnY2NCIgc3Ryb2tlPSIjZDhkZGU1IiBzdHJva2Utd2lkdGg9IjUiLz48Y2lyY2xlIGN4PSIyMjUiIGN5PSI2NiIgcj0iMTIiIGZpbGw9IiNmZjZmOGUiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNMjkgMTQ1aDIyNGwtMTQgMjJINDN6IiBmaWxsPSIjMzMzOTQ1IiBzdHJva2U9IiM4NThlOWMiIHN0cm9rZS13aWR0aD0iMyIvPgo8L2c+Cjwvc3ZnPg==', description: 'Une scène complète avec véhicule, cratère et balise lumineuse.',
+      tags: ['diorama', 'espace', 'lune']
+    },
+    {
+      id: 'robot_dog', name: 'Chien-Robot K9-Z', category: 'Figurine', universe: 'Chroniques Néon',
+      collection: 'Reliques Synthétiques', rarity: 'epic', price: 235, weight: 1.9, width: 104, height: 92,
+      image: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMzAgMTgwIiByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIj4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0idmlvbGV0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2I0OGNmZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzUxNDJjYSIvPjwvbGluZWFyR3JhZGllbnQ+CjxsaW5lYXJHcmFkaWVudCBpZD0iY3lhbiIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiM3ZGY3ZmYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxNjg5YjgiLz48L2xpbmVhckdyYWRpZW50Pgo8bGluZWFyR3JhZGllbnQgaWQ9Im1ldGFsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2Q5ZTBlYSIvPjxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjNzU4MDhlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMmQzNDQxIi8+PC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJnb2xkIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2ZmZjBhNSIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjZDQ5YjJlIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjN2Y0ODFkIi8+PC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iZ2xvdyIgeD0iLTYwJSIgeT0iLTYwJSIgd2lkdGg9IjIyMCUiIGhlaWdodD0iMjIwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNCIgcmVzdWx0PSJiIi8+PGZlTWVyZ2U+PGZlTWVyZ2VOb2RlIGluPSJiIi8+PGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+PC9mZU1lcmdlPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9InNoYWRvdyIgeD0iLTMwJSIgeT0iLTMwJSIgd2lkdGg9IjE2MCUiIGhlaWdodD0iMTYwJSI+PGZlRHJvcFNoYWRvdyBkeD0iMCIgZHk9IjUiIHN0ZERldmlhdGlvbj0iNSIgZmxvb2Qtb3BhY2l0eT0iLjQiLz48L2ZpbHRlcj48L2RlZnM+Cgo8ZWxsaXBzZSBjeD0iMTE1IiBjeT0iMTY0IiByeD0iNzkiIHJ5PSI5IiBmaWxsPSIjMDAwIiBvcGFjaXR5PSIuMjUiLz4KPGcgZmlsdGVyPSJ1cmwoI3NoYWRvdykiPgo8cGF0aCBkPSJNNjAgNzBoMTAxbDE4IDQ0LTI3IDMxSDY5bC0yNS0zMXoiIGZpbGw9InVybCgjbWV0YWwpIiBzdHJva2U9IiNkYmUzZWQiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNzcgODJoNjZsMTMgMjktMTcgMjBINzhsLTE2LTIweiIgZmlsbD0iIzIzMmQ0MCIvPjxwYXRoIGQ9Ik04NCA5Mmg1MyIgc3Ryb2tlPSIjNjRmMGRmIiBzdHJva2Utd2lkdGg9IjciIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNNjkgMTMzIDQ5IDE2MWgzMWwxNy0yNU0xNTEgMTMzbDIwIDI4aC0zMWwtMTctMjUiIGZpbGw9IiMzOTQ0NTciIHN0cm9rZT0iIzkyOWRhZiIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik0xNjEgODEgMTk1IDU2bDE3IDEzLTMzIDM3IiBmaWxsPSIjNGI1NjY5IiBzdHJva2U9IiNhNGFmYmUiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNTkgODUgMzEgNjIgMTcgNzVsMjcgMzEiIGZpbGw9IiM0YjU2NjkiIHN0cm9rZT0iI2E0YWZiZSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxwYXRoIGQ9Ik04NiA1NGg1OGwxNiAyMEg3MHoiIGZpbGw9IiMzYjQ1NTciLz48Y2lyY2xlIGN4PSIxMDEiIGN5PSI2OCIgcj0iNiIgZmlsbD0iI2ZmNmI4ZSIgZmlsdGVyPSJ1cmwoI2dsb3cpIi8+PGNpcmNsZSBjeD0iMTMxIiBjeT0iNjgiIHI9IjYiIGZpbGw9IiM2NGU4ZmYiIGZpbHRlcj0idXJsKCNnbG93KSIvPgo8cGF0aCBkPSJNMTc2IDkzYzI2IDEgMzEgMTcgMjAgMjgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdmOGE5ZCIgc3Ryb2tlLXdpZHRoPSI4IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9nPgo8L3N2Zz4=', description: 'Un compagnon mécanique conçu pour protéger les vitrines rares.',
+      tags: ['robot', 'chien', 'néon']
+    }
+  ],
+  shelves: [
+    { id: 'wood', name: 'Étagère bois sombre', price: 120, capacity: 12, className: 'shelf-wood', description: 'Classique, chaleureuse et polyvalente.' },
+    { id: 'acrylic', name: 'Étagère acrylique', price: 165, capacity: 8, className: 'shelf-acrylic', description: 'Légère, discrète et parfaite pour les petites pièces.' },
+    { id: 'metal', name: 'Étagère industrielle', price: 215, capacity: 20, className: 'shelf-metal', description: 'Très solide pour les statues et dioramas lourds.' },
+    { id: 'glass', name: 'Vitrine en verre', price: 295, capacity: 13, className: 'shelf-glass', description: 'Protège de la poussière et valorise les pièces rares.' },
+    { id: 'neon', name: 'Étagère néon', price: 355, capacity: 15, className: 'shelf-neon', description: 'Éclairage intégré pour les collections futuristes.' },
+    { id: 'museum', name: 'Socle de musée', price: 420, capacity: 18, className: 'shelf-museum', description: 'Un meuble premium pour les pièces maîtresses.' }
+  ],
+  themes: [
+    { id: 'bedroom', name: 'Chambre de collectionneur', price: 0, description: 'Le point de départ intime et chaleureux.' },
+    { id: 'neonroom', name: 'Studio néon', price: 320, description: 'Un mur urbain baigné de lumière synthétique.' },
+    { id: 'museumroom', name: 'Galerie privée', price: 480, description: 'Une présentation claire et luxueuse.' },
+    { id: 'retroroom', name: 'Arcade rétro', price: 390, description: 'Moquette cosmique, panneaux et souvenirs des années 90.' }
+  ],
+  lights: [
+    { id: 'warm', name: 'Chaleureux' },
+    { id: 'cool', name: 'Musée' },
+    { id: 'neon', name: 'Néon' },
+    { id: 'dark', name: 'Minuit' }
+  ]
+};
+
+</script>
+  <script>
+(() => {
+  'use strict';
+
+  const DATA = window.GAME_DATA;
+  const STORAGE_KEY = 'vitrineverse_save_v1';
+  const MAX_HISTORY = 45;
+  const MAX_SHELVES = 6;
+
+  const challenges = [
+    {
+      id: 'same_universe', title: 'Trilogie thématique', reward: 180, target: 3,
+      description: 'Expose trois objets du même univers sur une seule étagère.',
+      progress: () => {
+        let max = 0;
+        for (const shelf of state.shelves) {
+          const counts = {};
+          displayedOn(shelf.id).forEach(item => {
+            const def = getDef(item.defId);
+            if (!def) return;
+            counts[def.universe] = (counts[def.universe] || 0) + 1;
+          });
+          max = Math.max(max, ...Object.values(counts), 0);
+        }
+        return max;
+      }
+    },
+    {
+      id: 'category_mix', title: 'Culture sans frontières', reward: 220, target: 4,
+      description: 'Réunis quatre catégories différentes dans ta galerie.',
+      progress: () => new Set(displayedItems().map(item => getDef(item.defId)?.category).filter(Boolean)).size
+    },
+    {
+      id: 'prestige_300', title: 'Galerie remarquée', reward: 260, target: 300,
+      description: 'Atteins 300 points de prestige avec ta mise en scène.',
+      progress: () => computePrestige()
+    },
+    {
+      id: 'rare_five', title: 'Pièces de choix', reward: 300, target: 5,
+      description: 'Expose cinq objets rares, épiques ou légendaires.',
+      progress: () => displayedItems().filter(item => ['rare', 'epic', 'legendary'].includes(getDef(item.defId)?.rarity)).length
+    },
+    {
+      id: 'four_shelves', title: 'La grande extension', reward: 350, target: 4,
+      description: 'Possède au moins quatre étagères dans la galerie.',
+      progress: () => state.shelves.length
+    }
+  ];
+
+  let storageAvailable = true;
+  let state = loadState();
+  let history = [];
+  let future = [];
+  let selectedInstanceId = null;
+  let dragPayload = null;
+  let ui = {
+    panelTab: 'inventory',
+    shopTab: 'items',
+    inventorySearch: '',
+    inventoryFilter: 'Tout'
+  };
+
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => Array.from(document.querySelectorAll(selector));
+
+  const dom = {
+    coinsStat: $('#coinsStat'), prestigeStat: $('#prestigeStat'), dayStat: $('#dayStat'), cleanStat: $('#cleanStat'),
+    inventoryGrid: $('#inventoryGrid'), inventoryEmpty: $('#inventoryEmpty'), inventorySearch: $('#inventorySearch'),
+    inventoryFilters: $('#inventoryFilters'), shopGrid: $('#shopGrid'), collectionList: $('#collectionList'),
+    shelves: $('#shelves'), displayCount: $('#displayCount'), themeSelect: $('#themeSelect'), lightSelect: $('#lightSelect'),
+    inspectorCard: $('#inspectorCard'), activityLog: $('#activityLog'), saveStatus: $('#saveStatus'),
+    challengeTitle: $('#challengeTitle'), challengeReward: $('#challengeReward'), challengeDescription: $('#challengeDescription'),
+    challengeProgress: $('#challengeProgress'), challengeProgressText: $('#challengeProgressText'), claimChallengeBtn: $('#claimChallengeBtn'),
+    undoBtn: $('#undoBtn'), redoBtn: $('#redoBtn'), importDialog: $('#importDialog'), importForm: $('#importForm'),
+    importSaveInput: $('#importSaveInput'), toastStack: $('#toastStack')
+  };
+
+  function uid(prefix = 'id') {
+    if (window.crypto?.randomUUID) return `${prefix}_${crypto.randomUUID()}`;
+    if (window.crypto?.getRandomValues) {
+      const parts = new Uint32Array(3);
+      crypto.getRandomValues(parts);
+      return `${prefix}_${Array.from(parts).map(n => n.toString(36)).join('')}`;
+    }
+    return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2)}`;
+  }
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function esc(value) {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function formatNumber(value) {
+    return Math.round(value).toLocaleString('fr-FR');
+  }
+
+  function createDefaultState() {
+    const shelves = [
+      { id: 'shelf_start_wood', type: 'wood' },
+      { id: 'shelf_start_acrylic', type: 'acrylic' }
+    ];
+    const makeItem = (instanceId, defId, location = 'inventory', shelfId = null, x = 50, scale = 1, z = 1) => ({
+      instanceId, defId, location, shelfId, x, scale, flipped: false, z, acquiredDay: 1
+    });
+    return {
+      version: 1,
+      coins: 640,
+      day: 1,
+      cleanliness: 94,
+      bestPrestige: 0,
+      galleryName: 'Cabinet principal',
+      currentTheme: 'bedroom',
+      currentLight: 'warm',
+      unlockedThemes: ['bedroom'],
+      shelves,
+      items: [
+        makeItem('inst_neon_ronin', 'neon_ronin', 'shelf', shelves[0].id, 22, .9, 2),
+        makeItem('inst_holo_crystal', 'holo_crystal', 'shelf', shelves[0].id, 52, .86, 3),
+        makeItem('inst_comic_stack', 'comic_stack', 'shelf', shelves[0].id, 79, .9, 1),
+        makeItem('inst_retro_console', 'retro_console', 'shelf', shelves[1].id, 24, .9, 1),
+        makeItem('inst_arcade_cart', 'arcade_cart', 'shelf', shelves[1].id, 57, .84, 2),
+        makeItem('inst_vhs_night', 'vhs_night', 'shelf', shelves[1].id, 80, .82, 3),
+        makeItem('inst_pixel_mage', 'pixel_mage'),
+        makeItem('inst_void_cat', 'void_cat'),
+        makeItem('inst_alien_plush', 'alien_plush'),
+        makeItem('inst_pinboard', 'pinboard'),
+        makeItem('inst_spellbook', 'spellbook')
+      ],
+      customItems: [],
+      challengeIndex: 0,
+      completedChallenges: [],
+      log: [
+        'La galerie est ouverte. Organise tes premières pièces.',
+        'Astuce : les objets d’un même univers créent un bonus de cohérence.'
+      ]
+    };
+  }
+
+  function normalizeState(raw) {
+    const fallback = createDefaultState();
+    if (!raw || typeof raw !== 'object') return fallback;
+    const normalized = {
+      ...fallback,
+      ...raw,
+      coins: Number.isFinite(Number(raw.coins)) ? Number(raw.coins) : fallback.coins,
+      day: Math.max(1, Number(raw.day) || 1),
+      cleanliness: clamp(Number(raw.cleanliness) || 0, 0, 100),
+      shelves: Array.isArray(raw.shelves) ? raw.shelves.slice(0, MAX_SHELVES) : fallback.shelves,
+      items: Array.isArray(raw.items) ? raw.items : fallback.items,
+      customItems: Array.isArray(raw.customItems) ? raw.customItems.filter(validCustomDefinition) : [],
+      unlockedThemes: Array.isArray(raw.unlockedThemes) ? raw.unlockedThemes : ['bedroom'],
+      completedChallenges: Array.isArray(raw.completedChallenges) ? raw.completedChallenges : [],
+      log: Array.isArray(raw.log) ? raw.log.slice(0, 12) : fallback.log
+    };
+    if (!normalized.unlockedThemes.includes('bedroom')) normalized.unlockedThemes.unshift('bedroom');
+    if (!DATA.themes.some(theme => theme.id === normalized.currentTheme) || !normalized.unlockedThemes.includes(normalized.currentTheme)) {
+      normalized.currentTheme = 'bedroom';
+    }
+    if (!DATA.lights.some(light => light.id === normalized.currentLight)) normalized.currentLight = 'warm';
+    if (!normalized.shelves.length) normalized.shelves = [{ id: uid('shelf'), type: 'wood' }];
+    const validShelfIds = new Set(normalized.shelves.map(shelf => shelf.id));
+    normalized.items = normalized.items.filter(item => getDefinitionFrom(normalized, item.defId)).map(item => {
+      const safe = {
+        instanceId: String(item.instanceId || uid('item')),
+        defId: String(item.defId),
+        location: item.location === 'shelf' && validShelfIds.has(item.shelfId) ? 'shelf' : 'inventory',
+        shelfId: item.location === 'shelf' && validShelfIds.has(item.shelfId) ? item.shelfId : null,
+        x: clamp(Number(item.x) || 50, 3, 97),
+        scale: clamp(Number(item.scale) || 1, .58, 1.42),
+        flipped: Boolean(item.flipped),
+        z: clamp(Number(item.z) || 1, 1, 99),
+        acquiredDay: Math.max(1, Number(item.acquiredDay) || 1)
+      };
+      return safe;
+    });
+    return normalized;
+  }
+
+  function validCustomDefinition(def) {
+    return def && typeof def.id === 'string' && typeof def.name === 'string' &&
+      typeof def.image === 'string' && def.image.startsWith('data:image/');
+  }
+
+  function getDefinitionFrom(candidateState, defId) {
+    return DATA.items.find(item => item.id === defId) || candidateState.customItems?.find(item => item.id === defId);
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return normalizeState(raw ? JSON.parse(raw) : null);
+    } catch (error) {
+      storageAvailable = false;
+      console.warn('Sauvegarde locale indisponible, nouvelle partie temporaire créée.', error);
+      return createDefaultState();
+    }
+  }
+
+  function saveState() {
+    if (!storageAvailable) {
+      dom.saveStatus.textContent = 'Sauvegarde locale indisponible — utilise Exporter';
+      return false;
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      dom.saveStatus.textContent = `Sauvegardé à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+      window.clearTimeout(saveState.statusTimer);
+      saveState.statusTimer = window.setTimeout(() => {
+        dom.saveStatus.textContent = 'Sauvegarde locale active';
+      }, 2200);
+      return true;
+    } catch (error) {
+      storageAvailable = false;
+      console.warn('Sauvegarde locale désactivée.', error);
+      dom.saveStatus.textContent = 'Sauvegarde locale indisponible — utilise Exporter';
+      toast('La sauvegarde locale est indisponible. Utilise « Exporter la sauvegarde » pour conserver ta partie.', 'error', 5200);
+      return false;
+    }
+  }
+
+  function commit(mutator, message = '') {
+    history.push(clone(state));
+    if (history.length > MAX_HISTORY) history.shift();
+    future = [];
+    mutator();
+    if (message) addLog(message);
+    const prestige = computePrestige();
+    state.bestPrestige = Math.max(state.bestPrestige || 0, prestige);
+    saveState();
+    renderAll();
+  }
+
+  function undo() {
+    if (!history.length) return;
+    future.push(clone(state));
+    state = history.pop();
+    selectedInstanceId = state.items.some(item => item.instanceId === selectedInstanceId) ? selectedInstanceId : null;
+    saveState();
+    renderAll();
+    toast('Action annulée.');
+  }
+
+  function redo() {
+    if (!future.length) return;
+    history.push(clone(state));
+    state = future.pop();
+    selectedInstanceId = state.items.some(item => item.instanceId === selectedInstanceId) ? selectedInstanceId : null;
+    saveState();
+    renderAll();
+    toast('Action rétablie.');
+  }
+
+  function addLog(message) {
+    state.log.unshift(message);
+    state.log = state.log.slice(0, 10);
+  }
+
+  function getDef(defId) {
+    return getDefinitionFrom(state, defId);
+  }
+
+  function getShelfDef(type) {
+    return DATA.shelves.find(shelf => shelf.id === type) || DATA.shelves[0];
+  }
+
+  function getInstance(instanceId) {
+    return state.items.find(item => item.instanceId === instanceId);
+  }
+
+  function inventoryItems() {
+    return state.items.filter(item => item.location === 'inventory');
+  }
+
+  function displayedItems() {
+    return state.items.filter(item => item.location === 'shelf');
+  }
+
+  function displayedOn(shelfId) {
+    return state.items.filter(item => item.location === 'shelf' && item.shelfId === shelfId);
+  }
+
+  function shelfWeight(shelfId) {
+    return displayedOn(shelfId).reduce((sum, item) => sum + (Number(getDef(item.defId)?.weight) || 0), 0);
+  }
+
+  function shelfCanHold(shelfId, item, ignoreCurrent = true) {
+    const shelf = state.shelves.find(entry => entry.id === shelfId);
+    if (!shelf || !item) return false;
+    const shelfDef = getShelfDef(shelf.type);
+    let current = shelfWeight(shelfId);
+    if (ignoreCurrent && item.location === 'shelf' && item.shelfId === shelfId) {
+      current -= Number(getDef(item.defId)?.weight) || 0;
+    }
+    return current + (Number(getDef(item.defId)?.weight) || 0) <= shelfDef.capacity + 0.001;
+  }
+
+  function computePrestige() {
+    let total = 0;
+    for (const item of displayedItems()) {
+      const def = getDef(item.defId);
+      if (!def) continue;
+      const rarity = DATA.rarity[def.rarity] || DATA.rarity.common;
+      total += rarity.points + Math.round((def.price || 0) * 0.045);
+    }
+    for (const shelf of state.shelves) {
+      const items = displayedOn(shelf.id);
+      if (!items.length) continue;
+      const universeCounts = {};
+      const categories = new Set();
+      items.forEach(item => {
+        const def = getDef(item.defId);
+        if (!def) return;
+        universeCounts[def.universe] = (universeCounts[def.universe] || 0) + 1;
+        categories.add(def.category);
+      });
+      Object.values(universeCounts).forEach(count => {
+        if (count >= 2) total += (count - 1) * 14;
+      });
+      if (categories.size >= 3) total += categories.size * 4;
+      const shelfDef = getShelfDef(shelf.type);
+      if (['glass', 'neon', 'museum'].includes(shelfDef.id)) total += 7;
+    }
+    const cleanlinessMultiplier = .62 + (state.cleanliness / 100) * .38;
+    const themeBonus = state.currentTheme === 'bedroom' ? 0 : 8;
+    return Math.max(0, Math.round(total * cleanlinessMultiplier + themeBonus));
+  }
+
+  function currentChallenge() {
+    return challenges[state.challengeIndex % challenges.length];
+  }
+
+  function renderAll() {
+    renderBodyState();
+    renderStats();
+    renderTabs();
+    renderInventory();
+    renderShop();
+    renderCollections();
+    renderThemeControls();
+    renderShelves();
+    renderInspector();
+    renderChallenge();
+    renderActivity();
+    dom.undoBtn.disabled = history.length === 0;
+    dom.redoBtn.disabled = future.length === 0;
+  }
+
+  function renderBodyState() {
+    document.body.dataset.roomTheme = state.currentTheme;
+    document.body.dataset.light = state.currentLight;
+    $('#galleryTitle').textContent = state.galleryName || 'Cabinet principal';
+  }
+
+  function renderStats() {
+    dom.coinsStat.textContent = formatNumber(state.coins);
+    dom.prestigeStat.textContent = formatNumber(computePrestige());
+    dom.dayStat.textContent = String(state.day);
+    dom.cleanStat.textContent = `${Math.round(state.cleanliness)}%`;
+    dom.displayCount.textContent = String(displayedItems().length);
+  }
+
+  function renderTabs() {
+    $$('[data-panel-tab]').forEach(button => button.classList.toggle('active', button.dataset.panelTab === ui.panelTab));
+    $$('[data-panel-view]').forEach(view => view.classList.toggle('active', view.dataset.panelView === ui.panelTab));
+    $$('[data-shop-tab]').forEach(button => button.classList.toggle('active', button.dataset.shopTab === ui.shopTab));
+  }
+
+  function renderInventory() {
+    const categories = ['Tout', ...new Set(inventoryItems().map(item => getDef(item.defId)?.category).filter(Boolean))];
+    if (!categories.includes(ui.inventoryFilter)) ui.inventoryFilter = 'Tout';
+    dom.inventoryFilters.innerHTML = categories.map(category => `
+      <button class="filter-chip ${ui.inventoryFilter === category ? 'active' : ''}" data-filter="${esc(category)}">${esc(category)}</button>
+    `).join('');
+
+    const query = ui.inventorySearch.trim().toLocaleLowerCase('fr');
+    const items = inventoryItems().filter(item => {
+      const def = getDef(item.defId);
+      if (!def) return false;
+      const matchesFilter = ui.inventoryFilter === 'Tout' || def.category === ui.inventoryFilter;
+      const haystack = `${def.name} ${def.universe} ${def.category} ${def.collection || ''}`.toLocaleLowerCase('fr');
+      return matchesFilter && (!query || haystack.includes(query));
+    });
+
+    dom.inventoryGrid.innerHTML = items.map(item => inventoryCardHTML(item)).join('');
+    dom.inventoryEmpty.hidden = items.length > 0;
+    attachInventoryCardEvents();
+  }
+
+  function inventoryCardHTML(item) {
+    const def = getDef(item.defId);
+    const rarity = DATA.rarity[def.rarity] || DATA.rarity.common;
+    return `
+      <article class="item-card rarity-${esc(def.rarity)} ${selectedInstanceId === item.instanceId ? 'selected' : ''}"
+        draggable="true" tabindex="0" data-instance-id="${esc(item.instanceId)}" aria-label="${esc(def.name)}">
+        <button class="quick-place" data-quick-place="${esc(item.instanceId)}" title="Placer automatiquement">↗</button>
+        <div class="item-card-visual"><img src="${esc(def.image)}" alt="" draggable="false" /></div>
+        <h4>${esc(def.name)}</h4>
+        <div class="item-card-meta">
+          <span><i class="rarity-dot"></i>${esc(rarity.label)}</span>
+          <span>${esc(def.category)}</span>
+        </div>
+      </article>`;
+  }
+
+  function attachInventoryCardEvents() {
+    $$('.item-card[data-instance-id]').forEach(card => {
+      card.addEventListener('click', event => {
+        if (event.target.closest('[data-quick-place]')) return;
+        selectedInstanceId = card.dataset.instanceId;
+        renderAll();
+      });
+      card.addEventListener('dblclick', () => quickPlace(card.dataset.instanceId));
+      card.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectedInstanceId = card.dataset.instanceId;
+          renderAll();
+        }
+      });
+      card.addEventListener('dragstart', event => {
+        dragPayload = { source: 'inventory', instanceId: card.dataset.instanceId };
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', card.dataset.instanceId);
+      });
+      card.addEventListener('dragend', () => { dragPayload = null; });
+    });
+    $$('[data-quick-place]').forEach(button => {
+      button.addEventListener('click', event => {
+        event.stopPropagation();
+        quickPlace(button.dataset.quickPlace);
+      });
+    });
+  }
+
+  function renderShop() {
+    if (ui.shopTab === 'items') renderItemShop();
+    if (ui.shopTab === 'shelves') renderShelfShop();
+    if (ui.shopTab === 'themes') renderThemeShop();
+  }
+
+  function renderItemShop() {
+    const start = ((state.day - 1) * 5) % DATA.items.length;
+    const stock = Array.from({ length: Math.min(12, DATA.items.length) }, (_, index) => DATA.items[(start + index) % DATA.items.length]);
+    dom.shopGrid.innerHTML = stock.map(def => {
+      const rarity = DATA.rarity[def.rarity] || DATA.rarity.common;
+      const canBuy = state.coins >= def.price;
+      return `
+        <article class="shop-card rarity-${esc(def.rarity)}">
+          <img src="${esc(def.image)}" alt="" />
+          <div><h4>${esc(def.name)}</h4><p>${esc(def.universe)} · ${esc(rarity.label)}</p></div>
+          <div class="price"><span>${formatNumber(def.price)} ¤</span><button class="button" data-buy-item="${esc(def.id)}" ${canBuy ? '' : 'disabled'}>Acheter</button></div>
+        </article>`;
+    }).join('');
+    $$('[data-buy-item]').forEach(button => button.addEventListener('click', () => buyItem(button.dataset.buyItem)));
+  }
+
+  function renderShelfShop() {
+    dom.shopGrid.innerHTML = DATA.shelves.map(def => {
+      const canBuy = state.coins >= def.price && state.shelves.length < MAX_SHELVES;
+      return `
+        <article class="shop-card">
+          <div class="shop-swatch swatch-${esc(def.id)}"></div>
+          <div><h4>${esc(def.name)}</h4><p>${esc(def.description)} Capacité : ${def.capacity} kg.</p></div>
+          <div class="price"><span>${formatNumber(def.price)} ¤</span><button class="button" data-buy-shelf="${esc(def.id)}" ${canBuy ? '' : 'disabled'}>Acheter</button></div>
+        </article>`;
+    }).join('') + (state.shelves.length >= MAX_SHELVES ? '<p class="empty-state">La pièce actuelle est pleine. La version complète permettra d’acheter d’autres murs et salles.</p>' : '');
+    $$('[data-buy-shelf]').forEach(button => button.addEventListener('click', () => buyShelf(button.dataset.buyShelf)));
+  }
+
+  function renderThemeShop() {
+    dom.shopGrid.innerHTML = DATA.themes.map(def => {
+      const owned = state.unlockedThemes.includes(def.id);
+      const active = state.currentTheme === def.id;
+      const canBuy = state.coins >= def.price;
+      const label = active ? 'Active' : owned ? 'Appliquer' : 'Acheter';
+      return `
+        <article class="shop-card">
+          <div class="shop-swatch swatch-${esc(def.id)}"></div>
+          <div><h4>${esc(def.name)}</h4><p>${esc(def.description)}</p></div>
+          <div class="price"><span>${owned ? 'Possédée' : `${formatNumber(def.price)} ¤`}</span><button class="button" data-theme-action="${esc(def.id)}" ${active || (!owned && !canBuy) ? 'disabled' : ''}>${label}</button></div>
+        </article>`;
+    }).join('');
+    $$('[data-theme-action]').forEach(button => button.addEventListener('click', () => themeAction(button.dataset.themeAction)));
+  }
+
+  function renderCollections() {
+    const definitions = [...DATA.items, ...state.customItems];
+    const groups = new Map();
+    definitions.forEach(def => {
+      const key = def.collection || 'Créations personnelles';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(def);
+    });
+    const ownedIds = new Set(state.items.map(item => item.defId));
+    dom.collectionList.innerHTML = Array.from(groups.entries()).map(([name, defs]) => {
+      const owned = defs.filter(def => ownedIds.has(def.id)).length;
+      const percent = defs.length ? Math.round((owned / defs.length) * 100) : 0;
+      return `
+        <article class="collection-row">
+          <header><h4>${esc(name)}</h4><small>${owned} / ${defs.length}</small></header>
+          <div class="mini-progress"><span style="width:${percent}%"></span></div>
+        </article>`;
+    }).join('');
+  }
+
+  function renderThemeControls() {
+    dom.themeSelect.innerHTML = DATA.themes.filter(theme => state.unlockedThemes.includes(theme.id)).map(theme => `
+      <option value="${esc(theme.id)}" ${theme.id === state.currentTheme ? 'selected' : ''}>${esc(theme.name)}</option>
+    `).join('');
+    dom.lightSelect.innerHTML = DATA.lights.map(light => `
+      <option value="${esc(light.id)}" ${light.id === state.currentLight ? 'selected' : ''}>${esc(light.name)}</option>
+    `).join('');
+  }
+
+  function renderShelves() {
+    const dusty = state.cleanliness < 52 ? 'dusty' : '';
+    dom.shelves.innerHTML = state.shelves.map((shelf, index) => {
+      const shelfDef = getShelfDef(shelf.type);
+      const items = displayedOn(shelf.id).sort((a, b) => a.z - b.z);
+      const used = shelfWeight(shelf.id);
+      return `
+        <section class="shelf-unit ${esc(shelfDef.className)} ${dusty}" data-shelf-id="${esc(shelf.id)}">
+          <div class="shelf-topline">
+            <div class="shelf-label"><strong>${index + 1}</strong><span>${esc(shelfDef.name)}</span><span class="shelf-capacity">${used.toFixed(1)} / ${shelfDef.capacity} kg</span></div>
+            <div class="shelf-actions">
+              <button data-move-shelf="${esc(shelf.id)}" data-direction="-1" title="Monter" ${index === 0 ? 'disabled' : ''}>↑</button>
+              <button data-move-shelf="${esc(shelf.id)}" data-direction="1" title="Descendre" ${index === state.shelves.length - 1 ? 'disabled' : ''}>↓</button>
+              <button data-remove-shelf="${esc(shelf.id)}" title="Revendre l’étagère" ${items.length ? 'disabled' : ''}>×</button>
+            </div>
+          </div>
+          <div class="shelf-items">
+            ${items.length ? items.map(item => placedItemHTML(item)).join('') : '<div class="shelf-empty">Dépose ici une figurine ou un objet</div>'}
+          </div>
+        </section>`;
+    }).join('');
+    attachShelfEvents();
+  }
+
+  function placedItemHTML(item) {
+    const def = getDef(item.defId);
+    if (!def) return '';
+    return `
+      <div class="placed-item ${item.flipped ? 'flipped' : ''} ${selectedInstanceId === item.instanceId ? 'selected' : ''}"
+        draggable="true" tabindex="0" data-placed-id="${esc(item.instanceId)}" title="${esc(def.name)}"
+        style="left:${clamp(item.x, 3, 97)}%;--item-scale:${clamp(item.scale, .58, 1.42)};--item-width:${clamp(def.width || 86, 42, 160)}px;--item-height:${clamp(def.height || 110, 48, 170)}px;z-index:${clamp(item.z, 1, 99)}">
+        <span class="item-base-shadow"></span><img src="${esc(def.image)}" alt="${esc(def.name)}" draggable="false" />
+      </div>`;
+  }
+
+  function attachShelfEvents() {
+    $$('.shelf-unit[data-shelf-id]').forEach(shelf => {
+      shelf.addEventListener('dragover', event => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'move';
+        shelf.classList.add('drag-over');
+      });
+      shelf.addEventListener('dragleave', event => {
+        if (!shelf.contains(event.relatedTarget)) shelf.classList.remove('drag-over');
+      });
+      shelf.addEventListener('drop', event => {
+        event.preventDefault();
+        shelf.classList.remove('drag-over');
+        const instanceId = dragPayload?.instanceId || event.dataTransfer.getData('text/plain');
+        if (!instanceId) return;
+        const rect = shelf.getBoundingClientRect();
+        const x = clamp(((event.clientX - rect.left) / rect.width) * 100, 4, 96);
+        placeItem(instanceId, shelf.dataset.shelfId, x);
+      });
+    });
+
+    $$('.placed-item[data-placed-id]').forEach(element => {
+      element.addEventListener('click', event => {
+        event.stopPropagation();
+        selectedInstanceId = element.dataset.placedId;
+        renderAll();
+      });
+      element.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectedInstanceId = element.dataset.placedId;
+          renderAll();
+        }
+      });
+      element.addEventListener('dragstart', event => {
+        dragPayload = { source: 'shelf', instanceId: element.dataset.placedId };
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', element.dataset.placedId);
+        element.classList.add('dragging');
+      });
+      element.addEventListener('dragend', () => {
+        dragPayload = null;
+        element.classList.remove('dragging');
+      });
+    });
+
+    $$('[data-move-shelf]').forEach(button => button.addEventListener('click', () => {
+      moveShelf(button.dataset.moveShelf, Number(button.dataset.direction));
+    }));
+    $$('[data-remove-shelf]').forEach(button => button.addEventListener('click', () => removeShelf(button.dataset.removeShelf)));
+  }
+
+  function renderInspector() {
+    const item = getInstance(selectedInstanceId);
+    if (!item) {
+      dom.inspectorCard.innerHTML = `
+        <p class="eyebrow">Sélection</p><h2>Rien de sélectionné</h2>
+        <p class="muted">Choisis une figurine, un objet ou une pièce exposée pour afficher ses détails.</p>`;
+      return;
+    }
+    const def = getDef(item.defId);
+    const rarity = DATA.rarity[def.rarity] || DATA.rarity.common;
+    const locationLabel = item.location === 'shelf' ? `Étagère ${state.shelves.findIndex(shelf => shelf.id === item.shelfId) + 1}` : 'Inventaire';
+    const availableShelves = state.shelves.filter(shelf => shelfCanHold(shelf.id, item));
+    dom.inspectorCard.innerHTML = `
+      <div class="inspector-visual"><img src="${esc(def.image)}" alt="" /></div>
+      <div class="inspector-title-row">
+        <div><p class="eyebrow">${esc(def.universe)}</p><h2>${esc(def.name)}</h2></div>
+        <span class="rarity-badge rarity-${esc(def.rarity)}">${esc(rarity.label)}</span>
+      </div>
+      <p class="muted">${esc(def.description || 'Objet de collection personnalisé.')}</p>
+      <div class="inspector-meta">
+        <div class="meta-box"><span>Catégorie</span><strong>${esc(def.category)}</strong></div>
+        <div class="meta-box"><span>Emplacement</span><strong>${esc(locationLabel)}</strong></div>
+        <div class="meta-box"><span>Poids</span><strong>${Number(def.weight || 0).toFixed(1)} kg</strong></div>
+        <div class="meta-box"><span>Valeur</span><strong>${formatNumber(def.price || 0)} ¤</strong></div>
+      </div>
+      ${item.location === 'inventory' ? `
+        <select class="placement-select" id="inspectorShelfSelect" ${availableShelves.length ? '' : 'disabled'}>
+          ${availableShelves.map(shelf => `<option value="${esc(shelf.id)}">${esc(getShelfDef(shelf.type).name)}</option>`).join('')}
+        </select>
+        <div class="inspector-actions">
+          <button class="button accent span-all" id="inspectorPlaceBtn" ${availableShelves.length ? '' : 'disabled'}>Placer dans la vitrine</button>
+          <button class="button ghost span-all" id="inspectorSellBtn">Revendre pour ${formatNumber(Math.max(1, Math.round((def.price || 20) * .5)))} ¤</button>
+        </div>` : `
+        <div class="inspector-actions">
+          <button class="button ghost" data-item-action="left">←</button>
+          <button class="button ghost" data-item-action="flip">Retourner</button>
+          <button class="button ghost" data-item-action="right">→</button>
+          <button class="button ghost" data-item-action="smaller">– Taille</button>
+          <button class="button ghost" data-item-action="back">Arrière</button>
+          <button class="button ghost" data-item-action="larger">+ Taille</button>
+          <button class="button ghost" data-item-action="front">Premier plan</button>
+          <button class="button ghost span-all" data-item-action="inventory">Remettre dans l’inventaire</button>
+          <button class="button ghost span-all" id="inspectorSellBtn">Revendre pour ${formatNumber(Math.max(1, Math.round((def.price || 20) * .5)))} ¤</button>
+        </div>`}
+    `;
+
+    $('#inspectorPlaceBtn')?.addEventListener('click', () => {
+      const shelfId = $('#inspectorShelfSelect')?.value;
+      if (shelfId) placeItem(item.instanceId, shelfId, nextOpenX(shelfId));
+    });
+    $('#inspectorSellBtn')?.addEventListener('click', () => sellItem(item.instanceId));
+    $$('[data-item-action]').forEach(button => button.addEventListener('click', () => itemAction(item.instanceId, button.dataset.itemAction)));
+  }
+
+  function renderChallenge() {
+    const challenge = currentChallenge();
+    const progress = Math.min(challenge.target, Math.max(0, challenge.progress()));
+    const complete = progress >= challenge.target;
+    dom.challengeTitle.textContent = challenge.title;
+    dom.challengeReward.textContent = `+${challenge.reward}`;
+    dom.challengeDescription.textContent = challenge.description;
+    dom.challengeProgress.style.width = `${Math.round((progress / challenge.target) * 100)}%`;
+    dom.challengeProgressText.textContent = `${formatNumber(progress)} / ${formatNumber(challenge.target)}`;
+    dom.claimChallengeBtn.disabled = !complete;
+  }
+
+  function renderActivity() {
+    dom.activityLog.innerHTML = state.log.slice(0, 7).map(entry => `<div class="activity-entry"><span>${esc(entry)}</span></div>`).join('');
+  }
+
+  function buyItem(defId) {
+    const def = getDef(defId);
+    if (!def || state.coins < def.price) return toast('Crédits insuffisants.', 'error');
+    ui.panelTab = 'inventory';
+    commit(() => {
+      state.coins -= def.price;
+      state.items.push({
+        instanceId: uid('item'), defId: def.id, location: 'inventory', shelfId: null, x: 50,
+        scale: 1, flipped: false, z: 1, acquiredDay: state.day
+      });
+    }, `${def.name} a rejoint l’inventaire.`);
+    toast(`${def.name} acheté.`, 'success');
+  }
+
+  function buyShelf(type) {
+    const def = getShelfDef(type);
+    if (state.shelves.length >= MAX_SHELVES) return toast('Cette pièce ne peut pas accueillir d’étagère supplémentaire.', 'error');
+    if (state.coins < def.price) return toast('Crédits insuffisants.', 'error');
+    commit(() => {
+      state.coins -= def.price;
+      state.shelves.push({ id: uid('shelf'), type: def.id });
+    }, `${def.name} installée dans la galerie.`);
+    toast('Nouvelle étagère installée.', 'success');
+  }
+
+  function themeAction(themeId) {
+    const def = DATA.themes.find(theme => theme.id === themeId);
+    if (!def) return;
+    const owned = state.unlockedThemes.includes(themeId);
+    if (owned) {
+      commit(() => { state.currentTheme = themeId; }, `${def.name} devient le décor actif.`);
+      return;
+    }
+    if (state.coins < def.price) return toast('Crédits insuffisants.', 'error');
+    commit(() => {
+      state.coins -= def.price;
+      state.unlockedThemes.push(themeId);
+      state.currentTheme = themeId;
+    }, `${def.name} débloquée et appliquée.`);
+    toast('Nouvelle pièce débloquée.', 'success');
+  }
+
+  function quickPlace(instanceId) {
+    const item = getInstance(instanceId);
+    if (!item) return;
+    const shelf = state.shelves
+      .filter(entry => shelfCanHold(entry.id, item))
+      .sort((a, b) => shelfWeight(a.id) - shelfWeight(b.id))[0];
+    if (!shelf) return toast('Aucune étagère ne peut supporter cet objet.', 'error');
+    placeItem(instanceId, shelf.id, nextOpenX(shelf.id));
+  }
+
+  function nextOpenX(shelfId) {
+    const xs = displayedOn(shelfId).map(item => item.x).sort((a, b) => a - b);
+    const candidates = [10, 22, 34, 46, 58, 70, 82, 92];
+    return candidates.find(candidate => xs.every(x => Math.abs(x - candidate) > 8)) ?? clamp(10 + xs.length * 11, 5, 95);
+  }
+
+  function placeItem(instanceId, shelfId, x) {
+    const item = getInstance(instanceId);
+    const shelf = state.shelves.find(entry => entry.id === shelfId);
+    if (!item || !shelf) return;
+    if (!shelfCanHold(shelfId, item)) return toast(`Cette étagère ne peut pas supporter ${getDef(item.defId)?.name || 'cet objet'}.`, 'error');
+    const wasInventory = item.location === 'inventory';
+    commit(() => {
+      item.location = 'shelf';
+      item.shelfId = shelfId;
+      item.x = clamp(x, 4, 96);
+      item.z = Math.max(1, ...displayedOn(shelfId).filter(other => other.instanceId !== item.instanceId).map(other => other.z), 0) + 1;
+    }, wasInventory ? `${getDef(item.defId).name} est maintenant exposé.` : `${getDef(item.defId).name} a été déplacé.`);
+    selectedInstanceId = instanceId;
+    toast('Objet placé.', 'success');
+  }
+
+  function itemAction(instanceId, action) {
+    const item = getInstance(instanceId);
+    if (!item) return;
+    commit(() => {
+      if (action === 'left') item.x = clamp(item.x - 4, 3, 97);
+      if (action === 'right') item.x = clamp(item.x + 4, 3, 97);
+      if (action === 'flip') item.flipped = !item.flipped;
+      if (action === 'smaller') item.scale = clamp(item.scale - .08, .58, 1.42);
+      if (action === 'larger') item.scale = clamp(item.scale + .08, .58, 1.42);
+      if (action === 'front') item.z = Math.min(99, Math.max(...displayedOn(item.shelfId).map(other => other.z), 0) + 1);
+      if (action === 'back') item.z = Math.max(1, Math.min(...displayedOn(item.shelfId).filter(other => other.instanceId !== item.instanceId).map(other => other.z), 2) - 1);
+      if (action === 'inventory') {
+        item.location = 'inventory'; item.shelfId = null; item.x = 50; item.z = 1;
+      }
+    }, action === 'inventory' ? `${getDef(item.defId).name} retourne dans l’inventaire.` : 'Mise en scène ajustée.');
+  }
+
+  function sellItem(instanceId) {
+    const item = getInstance(instanceId);
+    if (!item) return;
+    const def = getDef(item.defId);
+    const value = Math.max(1, Math.round((def.price || 20) * .5));
+    if (!window.confirm(`Revendre « ${def.name} » pour ${value} crédits ?`)) return;
+    commit(() => {
+      state.coins += value;
+      state.items = state.items.filter(entry => entry.instanceId !== instanceId);
+    }, `${def.name} a été revendu pour ${value} crédits.`);
+    selectedInstanceId = null;
+    toast('Objet revendu.', 'success');
+  }
+
+  function moveShelf(shelfId, direction) {
+    const index = state.shelves.findIndex(shelf => shelf.id === shelfId);
+    const target = index + direction;
+    if (index < 0 || target < 0 || target >= state.shelves.length) return;
+    commit(() => {
+      const [shelf] = state.shelves.splice(index, 1);
+      state.shelves.splice(target, 0, shelf);
+    }, 'Ordre des étagères modifié.');
+  }
+
+  function removeShelf(shelfId) {
+    if (displayedOn(shelfId).length) return toast('Vide cette étagère avant de la revendre.', 'error');
+    if (state.shelves.length <= 1) return toast('Tu dois conserver au moins une étagère.', 'error');
+    const shelf = state.shelves.find(entry => entry.id === shelfId);
+    const def = getShelfDef(shelf?.type);
+    const refund = Math.round(def.price * .5);
+    commit(() => {
+      state.shelves = state.shelves.filter(entry => entry.id !== shelfId);
+      state.coins += refund;
+    }, `${def.name} revendue pour ${refund} crédits.`);
+  }
+
+  function openGallery() {
+    const prestige = computePrestige();
+    const glassProtection = state.shelves.filter(shelf => shelf.type === 'glass').length;
+    const dustLoss = Math.max(2, 7 - glassProtection);
+    const reward = Math.max(24, Math.round(28 + prestige * .19 + displayedItems().length * 2));
+    commit(() => {
+      state.coins += reward;
+      state.day += 1;
+      state.cleanliness = clamp(state.cleanliness - dustLoss, 0, 100);
+    }, `${reward} crédits reçus après une journée de visites.`);
+    toast(`Galerie ouverte : +${reward} crédits.`, 'success');
+  }
+
+  function cleanGallery() {
+    if (state.cleanliness >= 99) return toast('La galerie est déjà impeccable.');
+    const cost = 12;
+    if (state.coins < cost) return toast('Il faut 12 crédits pour le kit de nettoyage.', 'error');
+    commit(() => {
+      state.coins -= cost;
+      state.cleanliness = 100;
+    }, 'Toutes les vitrines ont été nettoyées.');
+    toast('Galerie nettoyée.', 'success');
+  }
+
+  function autoArrange() {
+    if (!displayedItems().length) return toast('Aucun objet à ranger.');
+    commit(() => {
+      state.shelves.forEach(shelf => {
+        const items = displayedOn(shelf.id).sort((a, b) => {
+          const da = getDef(a.defId); const db = getDef(b.defId);
+          return `${da.universe}-${da.name}`.localeCompare(`${db.universe}-${db.name}`, 'fr');
+        });
+        const step = 100 / (items.length + 1);
+        items.forEach((item, index) => {
+          item.x = clamp(step * (index + 1), 5, 95);
+          item.z = index + 1;
+        });
+      });
+    }, 'La galerie a été rangée automatiquement.');
+  }
+
+  function claimChallenge() {
+    const challenge = currentChallenge();
+    if (challenge.progress() < challenge.target) return;
+    commit(() => {
+      state.coins += challenge.reward;
+      state.completedChallenges.push(challenge.id);
+      state.challengeIndex = (state.challengeIndex + 1) % challenges.length;
+    }, `Défi « ${challenge.title} » terminé : +${challenge.reward} crédits.`);
+    toast('Récompense récupérée.', 'success');
+  }
+
+  function toast(message, type = '', duration = 2800) {
+    const element = document.createElement('div');
+    element.className = `toast ${type}`;
+    element.textContent = message;
+    dom.toastStack.appendChild(element);
+    window.setTimeout(() => element.remove(), duration);
+  }
+
+  async function compressImage(file) {
+    if (!file || !file.type.startsWith('image/')) throw new Error('Format d’image invalide.');
+    const source = await readFileAsDataURL(file);
+    const image = await loadImage(source);
+    const maxDimension = 512;
+    const ratio = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+    const width = Math.max(1, Math.round(image.naturalWidth * ratio));
+    const height = Math.max(1, Math.round(image.naturalHeight * ratio));
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const context = canvas.getContext('2d', { alpha: true });
+    context.clearRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+    let dataUrl;
+    try {
+      dataUrl = canvas.toDataURL('image/webp', .86);
+      if (!dataUrl.startsWith('data:image/webp')) dataUrl = canvas.toDataURL('image/png');
+    } catch {
+      dataUrl = canvas.toDataURL('image/png');
+    }
+    return { dataUrl, naturalWidth: width, naturalHeight: height };
+  }
+
+  function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error || new Error('Lecture impossible.'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error('Image illisible.'));
+      image.src = src;
+    });
+  }
+
+  async function importCustomItem(event) {
+    event.preventDefault();
+    const submit = $('#confirmImportBtn');
+    const file = $('#customImage').files[0];
+    if (!file) return toast('Choisis une image.', 'error');
+    submit.disabled = true;
+    submit.textContent = 'Préparation…';
+    try {
+      const prepared = await compressImage(file);
+      const size = Number($('#customSize').value) || 92;
+      const ratio = prepared.naturalWidth / prepared.naturalHeight;
+      const width = Math.round(ratio >= 1 ? size : size * ratio);
+      const height = Math.round(ratio >= 1 ? size / ratio : size);
+      const id = uid('custom');
+      const definition = {
+        id,
+        name: $('#customName').value.trim(),
+        universe: $('#customUniverse').value.trim(),
+        category: $('#customCategory').value,
+        collection: 'Créations personnelles',
+        rarity: $('#customRarity').value,
+        price: 0,
+        weight: clamp(Number($('#customWeight').value) || 1, .1, 20),
+        width: clamp(width, 42, 160),
+        height: clamp(height, 48, 170),
+        image: prepared.dataUrl,
+        description: 'Pièce personnalisée importée dans l’atelier de VITRINE//VERSE.',
+        tags: ['personnalisé']
+      };
+      ui.panelTab = 'inventory';
+      commit(() => {
+        state.customItems.push(definition);
+        state.items.push({
+          instanceId: uid('item'), defId: id, location: 'inventory', shelfId: null, x: 50,
+          scale: 1, flipped: false, z: 1, acquiredDay: state.day
+        });
+      }, `${definition.name} a été créé dans l’atelier.`);
+      dom.importDialog.close();
+      dom.importForm.reset();
+      toast('Objet personnalisé ajouté.', 'success');
+    } catch (error) {
+      console.error(error);
+      toast(error.message || 'Impossible d’importer cette image.', 'error');
+    } finally {
+      submit.disabled = false;
+      submit.textContent = 'Ajouter à l’inventaire';
+    }
+  }
+
+  function exportSave() {
+    const payload = JSON.stringify({
+      game: 'VITRINE//VERSE', exportedAt: new Date().toISOString(), state
+    }, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `vitrineverse_sauvegarde_jour_${state.day}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    toast('Sauvegarde exportée.', 'success');
+  }
+
+  async function importSave(file) {
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const candidate = parsed?.state || parsed;
+      const normalized = normalizeState(candidate);
+      history.push(clone(state));
+      state = normalized;
+      future = [];
+      selectedInstanceId = null;
+      saveState();
+      renderAll();
+      toast('Sauvegarde importée.', 'success');
+    } catch (error) {
+      console.error(error);
+      toast('Ce fichier de sauvegarde est invalide.', 'error');
+    } finally {
+      dom.importSaveInput.value = '';
+    }
+  }
+
+  function resetGame() {
+    if (!window.confirm('Recommencer depuis le début ? La sauvegarde actuelle sera remplacée.')) return;
+    history.push(clone(state));
+    state = createDefaultState();
+    future = [];
+    selectedInstanceId = null;
+    saveState();
+    renderAll();
+    toast('Nouvelle galerie créée.', 'success');
+  }
+
+  function togglePhotoMode(forceOff = false) {
+    if (forceOff) document.body.classList.remove('photo-mode');
+    else document.body.classList.toggle('photo-mode');
+  }
+
+  function bindEvents() {
+    $$('[data-panel-tab]').forEach(button => button.addEventListener('click', () => {
+      ui.panelTab = button.dataset.panelTab;
+      renderAll();
+    }));
+    $$('[data-shop-tab]').forEach(button => button.addEventListener('click', () => {
+      ui.shopTab = button.dataset.shopTab;
+      renderAll();
+    }));
+    dom.inventorySearch.addEventListener('input', () => {
+      ui.inventorySearch = dom.inventorySearch.value;
+      renderInventory();
+    });
+    dom.inventoryFilters.addEventListener('click', event => {
+      const button = event.target.closest('[data-filter]');
+      if (!button) return;
+      ui.inventoryFilter = button.dataset.filter;
+      renderInventory();
+    });
+    dom.themeSelect.addEventListener('change', () => commit(() => { state.currentTheme = dom.themeSelect.value; }, 'Décor de la galerie modifié.'));
+    dom.lightSelect.addEventListener('change', () => commit(() => { state.currentLight = dom.lightSelect.value; }, 'Ambiance lumineuse modifiée.'));
+    $('#visitorsBtn').addEventListener('click', openGallery);
+    $('#cleanBtn').addEventListener('click', cleanGallery);
+    $('#autoArrangeBtn').addEventListener('click', autoArrange);
+    dom.claimChallengeBtn.addEventListener('click', claimChallenge);
+    dom.undoBtn.addEventListener('click', undo);
+    dom.redoBtn.addEventListener('click', redo);
+    $('#photoModeBtn').addEventListener('click', () => togglePhotoMode());
+    $('#openImportBtn').addEventListener('click', () => dom.importDialog.showModal());
+    dom.importForm.addEventListener('submit', importCustomItem);
+    $('#exportSaveBtn').addEventListener('click', exportSave);
+    dom.importSaveInput.addEventListener('change', () => importSave(dom.importSaveInput.files[0]));
+    $('#resetBtn').addEventListener('click', resetGame);
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && document.body.classList.contains('photo-mode')) togglePhotoMode(true);
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        event.shiftKey ? redo() : undo();
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') {
+        event.preventDefault(); redo();
+      }
+      const selectedItem = getInstance(selectedInstanceId);
+      if (selectedItem?.location === 'shelf' && ['ArrowLeft', 'ArrowRight'].includes(event.key) && !['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement?.tagName)) {
+        event.preventDefault();
+        itemAction(selectedInstanceId, event.key === 'ArrowLeft' ? 'left' : 'right');
+      }
+    });
+  }
+
+  bindEvents();
+  renderAll();
+})();
+
+</script>
+</body>
+</html>

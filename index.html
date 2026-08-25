@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#11131d" />
+  <title>VITRINE//VERSE — Vitrine geek 2D</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-room-theme="bedroom" data-light="warm">
+  <header class="topbar">
+    <div class="brand" aria-label="Vitrine Verse">
+      <div class="brand-mark">VV</div>
+      <div>
+        <strong>VITRINE<span>//</span>VERSE</strong>
+        <small>Le musée de ta pop culture</small>
+      </div>
+    </div>
+
+    <div class="stats" aria-live="polite">
+      <div class="stat"><span>Crédits</span><strong id="coinsStat">0</strong></div>
+      <div class="stat"><span>Prestige</span><strong id="prestigeStat">0</strong></div>
+      <div class="stat"><span>Jour</span><strong id="dayStat">1</strong></div>
+      <div class="stat"><span>Propreté</span><strong id="cleanStat">100%</strong></div>
+    </div>
+
+    <div class="top-actions">
+      <button class="button ghost" id="undoBtn" title="Annuler (Ctrl+Z)">↶</button>
+      <button class="button ghost" id="redoBtn" title="Rétablir (Ctrl+Y)">↷</button>
+      <button class="button" id="visitorsBtn">Ouvrir la galerie</button>
+      <button class="button accent" id="photoModeBtn">Mode photo</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="panel library-panel" id="libraryPanel">
+      <div class="panel-tabs" role="tablist">
+        <button class="tab active" data-panel-tab="inventory">Inventaire</button>
+        <button class="tab" data-panel-tab="shop">Boutique</button>
+        <button class="tab" data-panel-tab="collection">Collections</button>
+      </div>
+
+      <section class="panel-view active" data-panel-view="inventory">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Objets possédés</p>
+            <h2>Inventaire</h2>
+          </div>
+          <button class="icon-button" id="openImportBtn" title="Importer une image">＋</button>
+        </div>
+        <label class="search-field">
+          <span>⌕</span>
+          <input id="inventorySearch" type="search" placeholder="Rechercher un objet…" autocomplete="off" />
+        </label>
+        <div class="filter-row" id="inventoryFilters"></div>
+        <div class="card-grid" id="inventoryGrid"></div>
+        <p class="empty-state" id="inventoryEmpty" hidden>Aucun objet ne correspond à ce filtre.</p>
+      </section>
+
+      <section class="panel-view" data-panel-view="shop">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Nouveautés du jour</p>
+            <h2>Boutique</h2>
+          </div>
+        </div>
+        <div class="subtabs">
+          <button class="subtab active" data-shop-tab="items">Objets</button>
+          <button class="subtab" data-shop-tab="shelves">Étagères</button>
+          <button class="subtab" data-shop-tab="themes">Pièces</button>
+        </div>
+        <div class="shop-list" id="shopGrid"></div>
+      </section>
+
+      <section class="panel-view" data-panel-view="collection">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Progression globale</p>
+            <h2>Collections</h2>
+          </div>
+        </div>
+        <div id="collectionList" class="collection-list"></div>
+      </section>
+    </aside>
+
+    <section class="stage-wrap">
+      <div class="room-toolbar">
+        <div class="toolbar-group">
+          <span>Pièce</span>
+          <select id="themeSelect" aria-label="Choisir le décor"></select>
+        </div>
+        <div class="toolbar-group">
+          <span>Lumière</span>
+          <select id="lightSelect" aria-label="Choisir la lumière"></select>
+        </div>
+        <button class="button ghost" id="cleanBtn">Nettoyer</button>
+        <button class="button ghost" id="autoArrangeBtn">Ranger automatiquement</button>
+      </div>
+
+      <div class="room-scroll" id="roomScroll">
+        <div class="room" id="room">
+          <div class="wall-art wall-art-a">PLAY<br />FOREVER</div>
+          <div class="wall-art wall-art-b">★</div>
+          <div class="ambient-glow"></div>
+          <div class="display-shell">
+            <div class="display-header">
+              <div>
+                <p class="eyebrow">Galerie personnelle</p>
+                <h1 id="galleryTitle">Cabinet principal</h1>
+              </div>
+              <div class="display-badge"><span id="displayCount">0</span> pièces exposées</div>
+            </div>
+            <div class="shelves" id="shelves"></div>
+            <div class="floor-shadow"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-footer">
+        <span>Glisse un objet sur une étagère, ou sélectionne-le puis utilise « Placer ».</span>
+        <span id="saveStatus">Sauvegarde locale prête</span>
+      </div>
+    </section>
+
+    <aside class="panel inspector-panel" id="inspectorPanel">
+      <section class="inspector-card" id="inspectorCard">
+        <p class="eyebrow">Sélection</p>
+        <h2>Rien de sélectionné</h2>
+        <p class="muted">Choisis une figurine, un objet ou une pièce exposée pour afficher ses détails.</p>
+      </section>
+
+      <section class="challenge-card">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Défi de vitrine</p>
+            <h3 id="challengeTitle">Trilogie thématique</h3>
+          </div>
+          <span class="reward-pill" id="challengeReward">+180</span>
+        </div>
+        <p id="challengeDescription">Expose trois objets du même univers sur une seule étagère.</p>
+        <div class="progress-track"><span id="challengeProgress"></span></div>
+        <small id="challengeProgressText">0 / 3</small>
+        <button class="button wide" id="claimChallengeBtn" disabled>Réclamer</button>
+      </section>
+
+      <section class="activity-card">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Journal</p>
+            <h3>Activité</h3>
+          </div>
+        </div>
+        <div class="activity-log" id="activityLog"></div>
+      </section>
+
+      <section class="save-card">
+        <button class="button ghost wide" id="exportSaveBtn">Exporter la sauvegarde</button>
+        <label class="button ghost wide file-button">
+          Importer une sauvegarde
+          <input id="importSaveInput" type="file" accept="application/json" hidden />
+        </label>
+        <button class="text-button danger" id="resetBtn">Recommencer la partie</button>
+      </section>
+    </aside>
+  </main>
+
+  <dialog id="importDialog" class="modal">
+    <form method="dialog" id="importForm">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">Atelier de contenu</p>
+          <h2>Importer une figurine ou un objet</h2>
+        </div>
+        <button class="icon-button" value="cancel" formnovalidate>×</button>
+      </div>
+      <p class="muted">Utilise une image PNG ou WebP détourée. Elle sera redimensionnée localement avant d’être ajoutée à ton inventaire.</p>
+      <div class="form-grid">
+        <label class="field full">Image
+          <input id="customImage" type="file" accept="image/png,image/webp,image/jpeg" required />
+        </label>
+        <label class="field">Nom
+          <input id="customName" type="text" maxlength="50" placeholder="Ex. Gardien de la Porte" required />
+        </label>
+        <label class="field">Univers
+          <input id="customUniverse" type="text" maxlength="50" placeholder="Ex. Archives Stellaires" required />
+        </label>
+        <label class="field">Catégorie
+          <select id="customCategory">
+            <option>Figurine</option><option>Buste</option><option>Réplique</option><option>Console</option>
+            <option>Jeu</option><option>Comic</option><option>VHS</option><option>Peluche</option><option>Prop</option><option>Diorama</option>
+          </select>
+        </label>
+        <label class="field">Rareté
+          <select id="customRarity">
+            <option value="common">Commun</option><option value="uncommon">Inhabituel</option><option value="rare" selected>Rare</option>
+            <option value="epic">Épique</option><option value="legendary">Légendaire</option>
+          </select>
+        </label>
+        <label class="field">Poids estimé (kg)
+          <input id="customWeight" type="number" min="0.1" max="20" step="0.1" value="1" required />
+        </label>
+        <label class="field">Taille d’affichage
+          <input id="customSize" type="range" min="56" max="150" value="92" />
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button class="button ghost" value="cancel" formnovalidate>Annuler</button>
+        <button class="button accent" value="default" id="confirmImportBtn">Ajouter à l’inventaire</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <div class="photo-hint" id="photoHint">Mode photo — appuie sur Échap pour revenir</div>
+
+  <script src="js/game-data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 240" role="img" aria-hidden="true">
+<defs>
+<linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b48cff"/><stop offset="1" stop-color="#5142ca"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7df7ff"/><stop offset="1" stop-color="#1689b8"/></linearGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9e0ea"/><stop offset=".45" stop-color="#75808e"/><stop offset="1" stop-color="#2d3441"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0a5"/><stop offset=".48" stop-color="#d49b2e"/><stop offset="1" stop-color="#7f481d"/></linearGradient>
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".4"/></filter></defs>
+
+<ellipse cx="90" cy="222" rx="54" ry="10" fill="#000" opacity=".25"/>
+<g filter="url(#shadow)">
+<path d="M58 80 40 145l17 11 15-61z" fill="#1b2031"/><path d="m122 80 18 65-17 11-15-61z" fill="#1b2031"/>
+<path d="M65 77 52 180h76L115 77z" fill="url(#violet)" stroke="#d5c7ff" stroke-width="3"/>
+<path d="M70 84h40l-5 54H75z" fill="#171c2c"/><path d="M78 92h24l-2 37H80z" fill="#4cf4e3" opacity=".55" filter="url(#glow)"/>
+<path d="M56 171 46 217h30l13-46zM124 171l10 46h-30l-13-46z" fill="#252b3e" stroke="#8e78ff" stroke-width="3"/>
+<circle cx="90" cy="50" r="30" fill="#22283a" stroke="#c5b8ff" stroke-width="3"/>
+<path d="M57 53h66l-9 26H66z" fill="#171a28"/><path d="M63 52h54" stroke="#57f3e0" stroke-width="5" filter="url(#glow)"/>
+<path d="M56 33 90 8l34 25-17-4-17 9-17-9z" fill="#2d3348" stroke="#9f8aff" stroke-width="3"/>
+<path d="M118 97 150 42" stroke="#8cf9ff" stroke-width="6" stroke-linecap="round" filter="url(#glow)"/><path d="M143 38l16-11" stroke="#d6fbff" stroke-width="4"/>
+<rect x="60" y="177" width="60" height="10" rx="5" fill="#10131d"/><path d="M65 183h50" stroke="#52eada" stroke-width="3" filter="url(#glow)"/>
+</g>
+</svg>

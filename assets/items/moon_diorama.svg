@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 190" role="img" aria-hidden="true">
+<defs>
+<linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b48cff"/><stop offset="1" stop-color="#5142ca"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7df7ff"/><stop offset="1" stop-color="#1689b8"/></linearGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9e0ea"/><stop offset=".45" stop-color="#75808e"/><stop offset="1" stop-color="#2d3441"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0a5"/><stop offset=".48" stop-color="#d49b2e"/><stop offset="1" stop-color="#7f481d"/></linearGradient>
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".4"/></filter></defs>
+
+<ellipse cx="140" cy="174" rx="105" ry="11" fill="#000" opacity=".28"/>
+<g filter="url(#shadow)">
+<path d="M27 145c22-59 64-83 113-83s91 24 113 83z" fill="#747b89" stroke="#d2d6de" stroke-width="3"/>
+<ellipse cx="96" cy="119" rx="31" ry="12" fill="#4d535f"/><ellipse cx="190" cy="133" rx="22" ry="8" fill="#505663"/>
+<path d="M115 58h62l12 67h-86z" fill="#dde4ed" stroke="#6d7786" stroke-width="3"/><path d="M122 72h47l6 27h-59z" fill="#2c4860"/><path d="M131 77h30" stroke="#68e6ff" stroke-width="5" filter="url(#glow)"/>
+<path d="M109 126h72l16 21H93z" fill="#424a58"/>
+<path d="M57 111h45l13 19H49z" fill="#b8c1ce"/><circle cx="62" cy="135" r="12" fill="#2e343e"/><circle cx="101" cy="135" r="12" fill="#2e343e"/><path d="M74 104h16l9 17H65z" fill="#344f68"/>
+<path d="M225 72v64" stroke="#d8dde5" stroke-width="5"/><circle cx="225" cy="66" r="12" fill="#ff6f8e" filter="url(#glow)"/>
+<path d="M29 145h224l-14 22H43z" fill="#333945" stroke="#858e9c" stroke-width="3"/>
+</g>
+</svg>

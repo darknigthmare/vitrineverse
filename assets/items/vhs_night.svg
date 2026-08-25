@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 185" role="img" aria-hidden="true">
+<defs>
+<linearGradient id="violet" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b48cff"/><stop offset="1" stop-color="#5142ca"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7df7ff"/><stop offset="1" stop-color="#1689b8"/></linearGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d9e0ea"/><stop offset=".45" stop-color="#75808e"/><stop offset="1" stop-color="#2d3441"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff0a5"/><stop offset=".48" stop-color="#d49b2e"/><stop offset="1" stop-color="#7f481d"/></linearGradient>
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity=".4"/></filter></defs>
+
+<ellipse cx="85" cy="169" rx="52" ry="8" fill="#000" opacity=".23"/>
+<g filter="url(#shadow)">
+<path d="M35 17h100v142H35z" fill="#1d202b" stroke="#8a90a0" stroke-width="3"/><path d="M45 27h80v75H45z" fill="#4b204b"/>
+<circle cx="85" cy="60" r="25" fill="#17141f"/><path d="M85 36 98 61 84 87 70 60z" fill="#ff5f83" opacity=".8" filter="url(#glow)"/>
+<path d="M48 112h74" stroke="#e5e8ef" stroke-width="6"/><path d="M48 126h52" stroke="#7b8190" stroke-width="5"/>
+<rect x="43" y="143" width="84" height="10" rx="4" fill="#0e1017"/>
+</g>
+</svg>
