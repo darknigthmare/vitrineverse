@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 220" role="img" aria-hidden="true" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="pk-armor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff09b"/><stop offset=".5" stop-color="#df8d3d"/><stop offset="1" stop-color="#753e3d"/></linearGradient>
+    <filter id="pk-shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="6" stdDeviation="4" flood-opacity=".4"/></filter>
+  </defs>
+  <ellipse cx="80" cy="207" rx="49" ry="8" fill="#11142a" opacity=".28"/>
+  <g filter="url(#pk-shadow)">
+    <path d="M55 22h50v12h12v48h-12v12H55V82H43V34h12z" fill="url(#pk-armor)" stroke="#4d2d48" stroke-width="4"/>
+    <path d="M57 48h18v12H57zm28 0h18v12H85z" fill="#8cf8ff"/><path d="M68 70h24v10H68z" fill="#352849"/>
+    <path d="M47 92h66l13 68h-24l-7-35-15 20-15-20-7 35H34z" fill="#5f4cc4" stroke="#c9b9ff" stroke-width="4"/>
+    <path d="M36 104 13 125l12 14 28-20zm88 0 23 21-12 14-28-20z" fill="#dba04d" stroke="#633d4c" stroke-width="4"/>
+    <path d="M50 157h25v44H43zm35 0h25l7 44H85z" fill="#293552" stroke="#87a0cf" stroke-width="4"/>
+    <path d="M126 91v72m0-58 20 16-20 16" stroke="#8cf8ff" stroke-width="7" stroke-linecap="square"/>
+    <path d="M55 101h50l-25 31z" fill="#f1c45a" opacity=".75"/>
+  </g>
+</svg>

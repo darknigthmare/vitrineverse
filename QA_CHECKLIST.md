@@ -3,9 +3,11 @@
 ## Démarrage
 
 - Le jeu s’ouvre sans connexion Internet.
-- Les dix-huit fichiers SVG se chargent.
-- Deux étagères et six objets exposés sont visibles.
+- Les trente fichiers SVG ou plus référencés par le catalogue se chargent.
+- La galerie de départ, son inventaire et le tutoriel sont visibles.
 - Aucun message d’erreur JavaScript n’apparaît.
+- Le manifeste est détecté et le service worker prend le contrôle après rechargement.
+- Après une première visite en ligne, le jeu redémarre hors connexion.
 
 ## Inventaire et boutique
 
@@ -31,13 +33,20 @@
 - Nettoyer coûte le montant prévu et restaure 100 %.
 - Le prestige réagit à la propreté et aux ensembles thématiques.
 - Le défi peut être réclamé une seule fois avant de passer au suivant.
+- Un défi déjà terminé reste non réclamable après rechargement.
+- Les objets personnels ne peuvent pas valider les objectifs compétitifs.
 
 ## Sauvegarde
 
 - Recharger la page restaure toute la composition.
-- Exporter produit un JSON lisible.
+- Exporter produit un JSON réimportable.
 - Importer ce JSON restaure la partie.
 - Un JSON invalide est refusé sans perdre la sauvegarde courante.
+- Une sauvegarde principale corrompue charge la copie de secours sans écraser les données brutes.
+- Une sauvegarde v1 migre vers v2 sans perdre les placements.
+- Un échec de quota annule intégralement l’action en cours.
+- Annuler/rétablir conserve l’état et ses piles si l’écriture locale échoue.
+- Les champs inconnus, volumes excessifs et créations dupliquées sont refusés ou normalisés.
 - Une image personnalisée persiste après rechargement tant que le quota local le permet.
 
 ## Interface
@@ -46,18 +55,43 @@
 - Tablette : vitrine et inventaire restent accessibles.
 - Mobile : cartes lisibles, sélection et placement possibles sans glisser-déposer.
 - Tabulation : tous les boutons importants sont atteignables.
+- Les sous-onglets Boutique suivent les flèches, Début et Fin avec un focus roving.
 - Échap quitte le mode photo.
+- Le bouton tactile quitte le mode photo sur mobile.
 - Ctrl/Cmd+Z et Ctrl/Cmd+Y fonctionnent.
 
-## Test automatique déjà exécuté sur cette livraison
+## Automatisation reproductible
 
-La livraison a été chargée dans Chromium via Playwright. Le contrôle a vérifié :
+Installer les dépendances et Chromium une première fois :
 
-- rendu de cinq cartes d’inventaire, six objets exposés et deux étagères ;
-- achat d’un objet ;
-- placement rapide ;
-- passage au jour suivant ;
-- annulation ;
-- achat d’une étagère ;
-- entrée et sortie du mode photo ;
-- absence d’erreur JavaScript pendant le scénario.
+```bash
+npm install
+npx playwright install chromium
+```
+
+Exécuter ensuite la porte de qualité complète :
+
+```bash
+npm run qa
+```
+
+Cette commande régénère d’abord `VITRINEVERSE_PLAY.html`, contrôle les contrats statiques avec `node:test`, démarre `py -3 -m http.server 8098 --bind 127.0.0.1`, puis exécute les parcours Playwright réels :
+
+- nouveau joueur et persistance de l’onboarding ;
+- achat, placement rapide et journée de visite ;
+- impossibilité de réclamer deux fois un même défi ;
+- reprise exacte depuis `localStorage` ;
+- migration v1 vers v2 et récupération sur copie de secours ;
+- progression maximale, carrière acquise et disponibilité de tout le contenu ;
+- achat et persistance d’un éclairage ;
+- annulation transactionnelle complète en cas de quota saturé ;
+- refus d’un JSON invalide sans perte de sauvegarde ;
+- refus des identifiants de meuble ou d’objet inconnus ;
+- rendements décroissants persistants même en alternant deux compositions ;
+- objectif de visites fondé sur douze présentations distinctes ;
+- version autonome ouverte directement sous `file://` sans erreur console ;
+- placement et réorganisation tactiles à 390×844 sans glisser-déposer ;
+- entrée et sortie tactile du mode photo ;
+- enregistrement du service worker et redémarrage hors ligne.
+
+Les commandes ciblées sont `npm run test:unit`, `npm run test:e2e` et `npm run build`. Un contrôle n’est considéré comme exécuté que lorsque la commande correspondante termine avec un code de sortie nul sur l’état courant du dépôt.

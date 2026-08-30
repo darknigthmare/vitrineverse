@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 120" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="nt-paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f0d89f"/><stop offset=".55" stop-color="#b98b62"/><stop offset="1" stop-color="#6d4650"/></linearGradient>
+    <filter id="nt-shadow" x="-25%" y="-45%" width="150%" height="210%"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-opacity=".4"/></filter>
+    <filter id="nt-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <ellipse cx="110" cy="105" rx="83" ry="7" fill="#160e14" opacity=".3"/>
+  <g filter="url(#nt-shadow)">
+    <path d="M17 29q15 0 15-15h156q0 15 15 15v60q-15 0-15 15H32q0-15-15-15z" fill="url(#nt-paper)" stroke="#f1d39a" stroke-width="3"/>
+    <path d="M55 18v82m110-82v82" stroke="#4f3541" stroke-width="3" stroke-dasharray="6 6" opacity=".7"/>
+    <path d="M72 35h76v49H72z" fill="#292039" stroke="#d3ab83" stroke-width="3"/>
+    <path d="M89 76c1-26 40-26 42 0-8-8-13-10-21-4-8-6-13-4-21 4z" fill="#725279"/>
+    <circle cx="110" cy="52" r="11" fill="#e5bd72"/><path d="M102 51h16m-8-8v16" stroke="#33263d" stroke-width="3"/>
+    <path d="M29 41h16m-16 10h16m130-10h16m-16 10h16" stroke="#5a3c48" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="43" cy="76" r="5" fill="#85eadb" filter="url(#nt-glow)"/><circle cx="177" cy="76" r="5" fill="#85eadb" filter="url(#nt-glow)"/>
+  </g>
+</svg>

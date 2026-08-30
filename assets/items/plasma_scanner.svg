@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 140" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="ps-shell" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e6edf2"/><stop offset=".5" stop-color="#7b8997"/><stop offset="1" stop-color="#303a47"/></linearGradient>
+    <linearGradient id="ps-screen" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#9dfff2"/><stop offset="1" stop-color="#2389ab"/></linearGradient>
+    <filter id="ps-shadow" x="-25%" y="-40%" width="150%" height="200%"><feDropShadow dx="0" dy="7" stdDeviation="5" flood-opacity=".4"/></filter>
+    <filter id="ps-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <ellipse cx="115" cy="122" rx="83" ry="8" fill="#09121b" opacity=".28"/>
+  <g filter="url(#ps-shadow)">
+    <path d="M35 41h143l32 29-32 30H35L14 82V59z" fill="url(#ps-shell)" stroke="#cbd8e2" stroke-width="3"/>
+    <path d="M60 52h74v37H60z" fill="#233746" stroke="#8bd8e8" stroke-width="3"/><path d="M69 61h56v19H69z" fill="url(#ps-screen)" filter="url(#ps-glow)"/>
+    <path d="m143 51 38 8 16 12-16 12-38 7z" fill="#2a3441" stroke="#7d8998" stroke-width="3"/><circle cx="181" cy="71" r="8" fill="#ffca68" filter="url(#ps-glow)"/>
+    <path d="M38 100h45l-9 30H42z" fill="#4b5664" stroke="#aab7c2" stroke-width="3"/>
+    <circle cx="40" cy="70" r="12" fill="#354659" stroke="#87f0e2" stroke-width="3"/><path d="M33 70h14m-7-7v14" stroke="#c8fff8" stroke-width="2"/>
+    <path d="M75 65h44m-44 9h30" stroke="#d9ffff" stroke-width="2" opacity=".7"/>
+  </g>
+</svg>

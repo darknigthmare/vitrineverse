@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 220" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="cp-frame" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e4bc70"/><stop offset=".45" stop-color="#8b5a31"/><stop offset="1" stop-color="#3c231d"/></linearGradient>
+    <radialGradient id="cp-bg"><stop stop-color="#5c5577"/><stop offset="1" stop-color="#171524"/></radialGradient>
+    <filter id="cp-shadow" x="-35%" y="-25%" width="170%" height="170%"><feDropShadow dx="0" dy="7" stdDeviation="6" flood-opacity=".48"/></filter>
+    <filter id="cp-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+  <ellipse cx="85" cy="207" rx="55" ry="8" fill="#0b0810" opacity=".35"/>
+  <g filter="url(#cp-shadow)">
+    <path d="M23 12h124l12 14-9 166-14 13H34l-14-13-9-166z" fill="url(#cp-frame)" stroke="#f3d38d" stroke-width="3"/>
+    <path d="M37 34h96v145H37z" fill="url(#cp-bg)" stroke="#4b352b" stroke-width="5"/>
+    <path d="M53 163c5-41 19-57 32-57s27 16 32 57z" fill="#28283b"/>
+    <ellipse cx="85" cy="84" rx="29" ry="36" fill="#b89f99"/><path d="M57 75c7-34 51-39 58 2-15-10-43-11-58-2z" fill="#24202d"/>
+    <path d="M67 86h12m12 0h12" stroke="#2c2430" stroke-width="5" stroke-linecap="round"/><circle cx="73" cy="86" r="3" fill="#9df5dc" filter="url(#cp-glow)"/><circle cx="97" cy="86" r="3" fill="#9df5dc" filter="url(#cp-glow)"/>
+    <path d="M77 104q8 6 16 0" fill="none" stroke="#704c58" stroke-width="3"/>
+    <path d="M44 45 126 169M126 45 44 169" stroke="#b9a1d8" stroke-width="2" opacity=".18"/>
+    <circle cx="85" cy="22" r="5" fill="#7df3da" filter="url(#cp-glow)"/>
+  </g>
+</svg>

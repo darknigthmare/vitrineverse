@@ -1,0 +1,33 @@
+{
+  "id": "./",
+  "name": "VITRINE//VERSE — Musée de collection",
+  "short_name": "VITRINE//VERSE",
+  "description": "Un jeu chaleureux de collection, de décoration et de gestion légère composé uniquement de créations originales.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#0b0d14",
+  "theme_color": "#11131d",
+  "categories": [
+    "games",
+    "entertainment",
+    "lifestyle"
+  ],
+  "icons": [
+    {
+      "src": "assets/items/holo_crystal.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "prefer_related_applications": false
+}

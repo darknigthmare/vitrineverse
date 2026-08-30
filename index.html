@@ -4,11 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#11131d" />
+  <meta name="description" content="Compose une galerie chaleureuse, collectionne des créations originales et fais grandir ton musée personnel." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>VITRINE//VERSE — Vitrine geek 2D</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/items/holo_crystal.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="preview/vitrineverse.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body data-room-theme="bedroom" data-light="warm">
-  <header class="topbar">
+  <a class="skip-link" href="#mainContent">Aller au contenu principal</a>
+  <header class="topbar" aria-label="En-tête de la galerie">
     <div class="brand" aria-label="Vitrine Verse">
       <div class="brand-mark">VV</div>
       <div>
@@ -17,62 +24,67 @@
       </div>
     </div>
 
-    <div class="stats" aria-live="polite">
+    <div class="stats" aria-label="Progression de la galerie">
       <div class="stat"><span>Crédits</span><strong id="coinsStat">0</strong></div>
       <div class="stat"><span>Prestige</span><strong id="prestigeStat">0</strong></div>
+      <div class="stat"><span>Niveau</span><strong id="levelStat">1</strong></div>
       <div class="stat"><span>Jour</span><strong id="dayStat">1</strong></div>
       <div class="stat"><span>Propreté</span><strong id="cleanStat">100%</strong></div>
     </div>
 
     <div class="top-actions">
-      <button class="button ghost" id="undoBtn" title="Annuler (Ctrl+Z)">↶</button>
-      <button class="button ghost" id="redoBtn" title="Rétablir (Ctrl+Y)">↷</button>
-      <button class="button" id="visitorsBtn">Ouvrir la galerie</button>
-      <button class="button accent" id="photoModeBtn">Mode photo</button>
+      <button type="button" class="button ghost compact-action" id="undoBtn" aria-label="Annuler la dernière action" title="Annuler (Ctrl+Z)">↶</button>
+      <button type="button" class="button ghost compact-action" id="redoBtn" aria-label="Rétablir la dernière action" title="Rétablir (Ctrl+Y)">↷</button>
+      <button type="button" class="button ghost" id="soundBtn" aria-pressed="true">Son : oui</button>
+      <button type="button" class="button ghost" id="installBtn" hidden>Installer le jeu</button>
+      <button type="button" class="button" id="visitorsBtn">Ouvrir la galerie</button>
+      <button type="button" class="button accent" id="photoModeBtn" aria-pressed="false">Mode photo</button>
     </div>
+    <div class="network-status" id="networkStatus" role="status" aria-live="polite">Connexion en cours…</div>
   </header>
 
-  <main class="app-shell">
-    <aside class="panel library-panel" id="libraryPanel">
-      <div class="panel-tabs" role="tablist">
-        <button class="tab active" data-panel-tab="inventory">Inventaire</button>
-        <button class="tab" data-panel-tab="shop">Boutique</button>
-        <button class="tab" data-panel-tab="collection">Collections</button>
+  <main class="app-shell" id="mainContent" tabindex="-1">
+    <aside class="panel library-panel" id="libraryPanel" aria-label="Collection et boutique">
+      <div class="panel-tabs" role="tablist" aria-label="Sections de la collection">
+        <button type="button" class="tab active" id="inventoryTab" role="tab" aria-selected="true" aria-controls="inventoryView" data-panel-tab="inventory">Inventaire</button>
+        <button type="button" class="tab" id="shopTab" role="tab" aria-selected="false" aria-controls="shopView" tabindex="-1" data-panel-tab="shop">Boutique</button>
+        <button type="button" class="tab" id="collectionTab" role="tab" aria-selected="false" aria-controls="collectionView" tabindex="-1" data-panel-tab="collection">Collections</button>
       </div>
 
-      <section class="panel-view active" data-panel-view="inventory">
+      <section class="panel-view active" id="inventoryView" role="tabpanel" aria-labelledby="inventoryTab" data-panel-view="inventory">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Objets possédés</p>
             <h2>Inventaire</h2>
           </div>
-          <button class="icon-button" id="openImportBtn" title="Importer une image">＋</button>
+          <button type="button" class="icon-button" id="openImportBtn" aria-label="Importer une image personnalisée" title="Importer une image">＋</button>
         </div>
         <label class="search-field">
-          <span>⌕</span>
+          <span class="sr-only">Rechercher dans l’inventaire</span>
+          <span aria-hidden="true">⌕</span>
           <input id="inventorySearch" type="search" placeholder="Rechercher un objet…" autocomplete="off" />
         </label>
-        <div class="filter-row" id="inventoryFilters"></div>
-        <div class="card-grid" id="inventoryGrid"></div>
+        <div class="filter-row" id="inventoryFilters" aria-label="Filtres de l’inventaire"></div>
+        <div class="card-grid" id="inventoryGrid" aria-live="polite"></div>
         <p class="empty-state" id="inventoryEmpty" hidden>Aucun objet ne correspond à ce filtre.</p>
       </section>
 
-      <section class="panel-view" data-panel-view="shop">
+      <section class="panel-view" id="shopView" role="tabpanel" aria-labelledby="shopTab" data-panel-view="shop" hidden>
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Nouveautés du jour</p>
             <h2>Boutique</h2>
           </div>
         </div>
-        <div class="subtabs">
-          <button class="subtab active" data-shop-tab="items">Objets</button>
-          <button class="subtab" data-shop-tab="shelves">Étagères</button>
-          <button class="subtab" data-shop-tab="themes">Pièces</button>
+        <div class="subtabs" role="tablist" aria-label="Rayons de la boutique">
+          <button id="shopItemsTab" type="button" class="subtab active" role="tab" aria-selected="true" aria-controls="shopGrid" data-shop-tab="items">Objets</button>
+          <button id="shopShelvesTab" type="button" class="subtab" role="tab" aria-selected="false" aria-controls="shopGrid" data-shop-tab="shelves" tabindex="-1">Étagères</button>
+          <button id="shopThemesTab" type="button" class="subtab" role="tab" aria-selected="false" aria-controls="shopGrid" data-shop-tab="themes" tabindex="-1">Décors</button>
         </div>
-        <div class="shop-list" id="shopGrid"></div>
+        <div class="shop-list" id="shopGrid" role="tabpanel" aria-labelledby="shopItemsTab" aria-live="polite" tabindex="0"></div>
       </section>
 
-      <section class="panel-view" data-panel-view="collection">
+      <section class="panel-view" id="collectionView" role="tabpanel" aria-labelledby="collectionTab" data-panel-view="collection" hidden>
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Progression globale</p>
@@ -83,8 +95,8 @@
       </section>
     </aside>
 
-    <section class="stage-wrap">
-      <div class="room-toolbar">
+    <section class="stage-wrap" aria-label="Vitrine principale">
+      <div class="room-toolbar" aria-label="Outils de mise en scène">
         <div class="toolbar-group">
           <span>Pièce</span>
           <select id="themeSelect" aria-label="Choisir le décor"></select>
@@ -93,11 +105,18 @@
           <span>Lumière</span>
           <select id="lightSelect" aria-label="Choisir la lumière"></select>
         </div>
-        <button class="button ghost" id="cleanBtn">Nettoyer</button>
-        <button class="button ghost" id="autoArrangeBtn">Ranger automatiquement</button>
+        <div class="toolbar-group">
+          <span>Placement</span>
+          <select id="placementModeSelect" aria-label="Choisir le mode de placement">
+            <option value="magnetic">Magnétique</option>
+            <option value="free">Libre</option>
+          </select>
+        </div>
+        <button type="button" class="button ghost" id="cleanBtn">Nettoyer</button>
+        <button type="button" class="button ghost" id="autoArrangeBtn">Ranger automatiquement</button>
       </div>
 
-      <div class="room-scroll" id="roomScroll">
+      <div class="room-scroll" id="roomScroll" tabindex="0" aria-label="Zone défilable de la vitrine">
         <div class="room" id="room">
           <div class="wall-art wall-art-a">PLAY<br />FOREVER</div>
           <div class="wall-art wall-art-b">★</div>
@@ -118,15 +137,62 @@
 
       <div class="stage-footer">
         <span>Glisse un objet sur une étagère, ou sélectionne-le puis utilise « Placer ».</span>
-        <span id="saveStatus">Sauvegarde locale prête</span>
+        <span id="saveStatus" role="status" aria-live="polite">Sauvegarde locale prête</span>
       </div>
     </section>
 
-    <aside class="panel inspector-panel" id="inspectorPanel">
+    <aside class="panel inspector-panel" id="inspectorPanel" aria-label="Détails et progression">
       <section class="inspector-card" id="inspectorCard">
         <p class="eyebrow">Sélection</p>
         <h2>Rien de sélectionné</h2>
         <p class="muted">Choisis une figurine, un objet ou une pièce exposée pour afficher ses détails.</p>
+      </section>
+
+      <section class="career-card" id="careerCard" aria-labelledby="careerHeading">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Carrière de collectionneur</p>
+            <h3 id="careerHeading">Chapitre actuel</h3>
+          </div>
+          <span class="chapter-pill" id="chapterName">Coin de chambre</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="Progression vers le prochain niveau" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="reputationProgress"></span>
+        </div>
+        <small id="reputationProgressText">0 / 100 réputation</small>
+        <p class="muted compact-copy" id="nextUnlockText">La prochaine découverte apparaîtra ici.</p>
+        <p class="prestige-breakdown" id="prestigeBreakdown">Le détail du prestige apparaîtra ici.</p>
+      </section>
+
+      <section class="brief-card" id="briefCard" aria-labelledby="briefTitle" hidden>
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Commande d’exposition</p>
+            <h3 id="briefTitle">Brief du jour</h3>
+          </div>
+          <span class="reward-pill" id="briefReward">+0</span>
+        </div>
+        <p id="briefDescription">Compose une scène selon la demande des visiteurs.</p>
+        <div class="progress-track" role="progressbar" aria-label="Progression du brief" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span id="briefProgress"></span>
+        </div>
+        <small id="briefProgressText">0 / 1</small>
+      </section>
+
+      <section class="tutorial-card" id="tutorialCard" aria-labelledby="tutorialHeading">
+        <div class="section-title-row">
+          <div>
+            <p class="eyebrow">Premiers pas</p>
+            <h3 id="tutorialHeading">Prendre ses marques</h3>
+          </div>
+        </div>
+        <ol class="tutorial-list" id="tutorialList">
+          <li>Explorer la boutique</li>
+          <li>Acquérir une nouvelle pièce</li>
+          <li>Ajuster la mise en scène</li>
+          <li>Accueillir les premiers visiteurs</li>
+        </ol>
+        <button type="button" class="button ghost wide" id="replayTutorialBtn">Revoir l’accueil</button>
       </section>
 
       <section class="challenge-card">
@@ -138,9 +204,9 @@
           <span class="reward-pill" id="challengeReward">+180</span>
         </div>
         <p id="challengeDescription">Expose trois objets du même univers sur une seule étagère.</p>
-        <div class="progress-track"><span id="challengeProgress"></span></div>
+        <div class="progress-track" role="progressbar" aria-label="Progression du défi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="challengeProgress"></span></div>
         <small id="challengeProgressText">0 / 3</small>
-        <button class="button wide" id="claimChallengeBtn" disabled>Réclamer</button>
+        <button type="button" class="button wide" id="claimChallengeBtn" disabled>Réclamer</button>
       </section>
 
       <section class="activity-card">
@@ -154,26 +220,29 @@
       </section>
 
       <section class="save-card">
-        <button class="button ghost wide" id="exportSaveBtn">Exporter la sauvegarde</button>
+        <button type="button" class="button ghost wide" id="exportSaveBtn">Exporter la sauvegarde</button>
         <label class="button ghost wide file-button">
           Importer une sauvegarde
-          <input id="importSaveInput" type="file" accept="application/json" hidden />
+          <input class="visually-hidden-file" id="importSaveInput" type="file" accept="application/json" aria-label="Choisir une sauvegarde JSON à importer" />
         </label>
-        <button class="text-button danger" id="resetBtn">Recommencer la partie</button>
+        <button type="button" class="button ghost wide" id="restoreBackupBtn">Restaurer la sauvegarde de sécurité</button>
+        <button type="button" class="text-button danger" id="resetBtn">Recommencer la partie</button>
       </section>
     </aside>
   </main>
 
-  <dialog id="importDialog" class="modal">
+  <button type="button" class="photo-exit-button" id="exitPhotoModeBtn">Quitter le mode photo</button>
+
+  <dialog id="importDialog" class="modal" aria-labelledby="importDialogTitle" aria-describedby="importDialogDescription">
     <form method="dialog" id="importForm">
       <div class="modal-heading">
         <div>
           <p class="eyebrow">Atelier de contenu</p>
-          <h2>Importer une figurine ou un objet</h2>
+          <h2 id="importDialogTitle">Importer une figurine ou un objet</h2>
         </div>
-        <button class="icon-button" value="cancel" formnovalidate>×</button>
+        <button class="icon-button" value="cancel" formnovalidate aria-label="Fermer la fenêtre d’import">×</button>
       </div>
-      <p class="muted">Utilise une image PNG ou WebP détourée. Elle sera redimensionnée localement avant d’être ajoutée à ton inventaire.</p>
+      <p class="muted" id="importDialogDescription">Utilise une image PNG ou WebP détourée. Elle sera redimensionnée localement avant d’être ajoutée à ton inventaire.</p>
       <div class="form-grid">
         <label class="field full">Image
           <input id="customImage" type="file" accept="image/png,image/webp,image/jpeg" required />
@@ -206,6 +275,39 @@
       <div class="modal-actions">
         <button class="button ghost" value="cancel" formnovalidate>Annuler</button>
         <button class="button accent" value="default" id="confirmImportBtn">Ajouter à l’inventaire</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="welcomeDialog" class="modal welcome-modal" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
+    <form method="dialog">
+      <p class="eyebrow">Bienvenue dans ta galerie</p>
+      <h2 id="welcomeTitle">Chaque pièce mérite sa place</h2>
+      <p class="muted" id="welcomeDescription">Tu commences dans un coin de chambre avec quelques créations originales. Explore la boutique, arrange librement ta vitrine puis accueille des visiteurs pour développer ta collection.</p>
+      <ul class="welcome-steps">
+        <li><strong>Choisis</strong> une pièce qui te ressemble.</li>
+        <li><strong>Compose</strong> ta scène en mode magnétique ou libre.</li>
+        <li><strong>Progresse</strong> sans achat réel ; ta partie reste enregistrée sur cet appareil.</li>
+      </ul>
+      <div class="modal-actions">
+        <button class="button accent" id="startJourneyBtn" value="start">Commencer ma galerie</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="visitDialog" class="modal visit-modal" aria-labelledby="visitReportTitle">
+    <form method="dialog">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">Rapport de visite</p>
+          <h2 id="visitReportTitle">La galerie ferme ses portes</h2>
+        </div>
+      </div>
+      <div class="visit-report-body" id="visitReportBody">
+        <p class="muted">Les impressions des visiteurs apparaîtront ici après l’ouverture.</p>
+      </div>
+      <div class="modal-actions">
+        <button class="button accent" id="closeVisitReportBtn" value="close">Continuer</button>
       </div>
     </form>
   </dialog>
