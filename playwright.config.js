@@ -23,7 +23,7 @@ module.exports = defineConfig({
     trace: 'retain-on-failure'
   },
   webServer: {
-    command: 'py -3 -m http.server 8098 --bind 127.0.0.1',
+    command: 'node scripts/static-server.js',
     url: 'http://127.0.0.1:8098',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

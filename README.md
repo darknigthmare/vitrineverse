@@ -10,10 +10,10 @@ Ouvrir `VITRINEVERSE_PLAY.html` dans un navigateur récent. Cette version contie
 
 ### Méthode projet
 
-Pour bénéficier de l’installation PWA, de la reprise hors ligne et des contrôles automatisés, lancer le serveur local depuis ce dossier :
+Pour bénéficier de l’installation PWA, de la reprise hors ligne et des contrôles automatisés, lancer le serveur local multiplateforme depuis ce dossier :
 
 ```bash
-py -3 -m http.server 8098 --bind 127.0.0.1
+npm run serve
 ```
 
 Puis ouvrir `http://127.0.0.1:8098`. Après une première visite en ligne, le service worker conserve le cœur du jeu pour une reprise hors connexion.
@@ -110,6 +110,6 @@ vitrineverse/
 2. Ouvrir `js/game-data.js`.
 3. Modifier le chemin `image`, puis les métadonnées de l’objet.
 4. Garder un identifiant `id` unique et stable pour ne pas casser les sauvegardes.
-5. Régénérer `VITRINEVERSE_PLAY.html` avec `build_single_file.py`.
+5. Régénérer `VITRINEVERSE_PLAY.html` avec `npm run build`.
 
 Le catalogue du projet est original et ne doit reprendre aucune licence existante. Les personnages ou objets protégés ne peuvent être ajoutés qu’avec les droits nécessaires.

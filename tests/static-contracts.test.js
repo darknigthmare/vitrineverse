@@ -151,14 +151,16 @@ test('le manifeste et le service worker forment un contrat PWA complet', () => {
 
 test('la commande de build produit une version autonome sans références de jeu externes', () => {
   const packageJson = JSON.parse(read('package.json'));
-  assert.equal(packageJson.scripts.build, 'py -3 build_single_file.py');
+  assert.equal(packageJson.scripts.build, 'node build_single_file.js');
+  assert.equal(packageJson.scripts.serve, 'node scripts/static-server.js');
   assert.equal(packageJson.scripts['test:unit'], 'node --test tests/static-contracts.test.js');
   assert.equal(packageJson.scripts['test:e2e'], 'playwright test');
 
-  const buildScript = read('build_single_file.py');
+  const buildScript = read('build_single_file.js');
   for (const source of ['index.html', 'styles.css', 'game-data.js', 'app.js', 'assets']) {
     assert.ok(buildScript.includes(source), `Le build doit intégrer ${source}`);
   }
+  assert.match(read('playwright.config.js'), /command:\s*['"]node scripts\/static-server\.js['"]/, 'Playwright doit utiliser le serveur Node multiplateforme');
 
   const standalonePath = path.join(ROOT, 'VITRINEVERSE_PLAY.html');
   assert.ok(fs.existsSync(standalonePath), 'VITRINEVERSE_PLAY.html est absent ; exécuter npm run build');

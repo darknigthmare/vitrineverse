@@ -75,7 +75,7 @@ Exécuter ensuite la porte de qualité complète :
 npm run qa
 ```
 
-Cette commande régénère d’abord `VITRINEVERSE_PLAY.html`, contrôle les contrats statiques avec `node:test`, démarre `py -3 -m http.server 8098 --bind 127.0.0.1`, puis exécute les parcours Playwright réels :
+Cette commande régénère d’abord `VITRINEVERSE_PLAY.html`, contrôle les contrats statiques avec `node:test`, démarre le serveur Node local sur `127.0.0.1:8098`, puis exécute les parcours Playwright réels :
 
 - nouveau joueur et persistance de l’onboarding ;
 - achat, placement rapide et journée de visite ;

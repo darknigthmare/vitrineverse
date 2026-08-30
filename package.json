@@ -7,13 +7,14 @@
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "node --test tests/static-contracts.test.js",
     "test:e2e": "playwright test",
-    "build": "py -3 build_single_file.py",
+    "build": "node build_single_file.js",
+    "serve": "node scripts/static-server.js",
     "qa": "npm run build && npm run test"
   },
   "devDependencies": {
     "@playwright/test": "^1.55.0"
   },
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   }
 }
